@@ -125,9 +125,9 @@ class TestLexer:
         assert result == expected
 
     def test_tokenize_numbers(self):
-        """Test tokenizing expression with numbers (should be treated as non-letters)."""
+        """Test tokenizing expression with numbers (should be grouped as multi-digit numbers)."""
         expr = "Alpha123+Beta456"
-        expected = ["Alpha", "1", "2", "3", "+", "Beta", "4", "5", "6"]
+        expected = ["Alpha", "123", "+", "Beta", "456"]
         result = tokenize(expr)
         assert result == expected
 
@@ -258,5 +258,83 @@ class TestLexer:
         """Test tokenizing expression ending with multi-character operator."""
         expr = "Alpha++"
         expected = ["Alpha", "++"]
+        result = tokenize(expr)
+        assert result == expected
+
+    # Tests for multi-digit numbers
+    def test_tokenize_multi_digit_number(self):
+        """Test tokenizing multi-digit numbers like 100."""
+        expr = "100"
+        expected = ["100"]
+        result = tokenize(expr)
+        assert result == expected
+
+    def test_tokenize_number_with_operators(self):
+        """Test tokenizing numbers with operators."""
+        expr = "100+200"
+        expected = ["100", "+", "200"]
+        result = tokenize(expr)
+        assert result == expected
+
+    def test_tokenize_number_with_variables(self):
+        """Test tokenizing numbers mixed with variables."""
+        expr = "Alpha100+Beta200"
+        expected = ["Alpha", "100", "+", "Beta", "200"]
+        result = tokenize(expr)
+        assert result == expected
+
+    def test_tokenize_large_number(self):
+        """Test tokenizing large numbers."""
+        expr = "12345"
+        expected = ["12345"]
+        result = tokenize(expr)
+        assert result == expected
+
+    def test_tokenize_number_after_variable(self):
+        """Test tokenizing number that comes after a variable."""
+        expr = "Alpha100"
+        expected = ["Alpha", "100"]
+        result = tokenize(expr)
+        assert result == expected
+
+    def test_tokenize_variable_after_number(self):
+        """Test tokenizing variable that comes after a number."""
+        expr = "100Alpha"
+        expected = ["100", "Alpha"]
+        result = tokenize(expr)
+        assert result == expected
+
+    def test_tokenize_numbers_with_parentheses(self):
+        """Test tokenizing numbers with parentheses."""
+        expr = "(100+200)"
+        expected = ["(", "100", "+", "200", ")"]
+        result = tokenize(expr)
+        assert result == expected
+
+    def test_tokenize_complex_expression_with_numbers(self):
+        """Test tokenizing complex expression with numbers and variables."""
+        expr = "Alpha100+Beta200*300"
+        expected = ["Alpha", "100", "+", "Beta", "200", "*", "300"]
+        result = tokenize(expr)
+        assert result == expected
+
+    def test_tokenize_single_digit_number(self):
+        """Test tokenizing single digit numbers."""
+        expr = "5"
+        expected = ["5"]
+        result = tokenize(expr)
+        assert result == expected
+
+    def test_tokenize_zero(self):
+        """Test tokenizing zero."""
+        expr = "0"
+        expected = ["0"]
+        result = tokenize(expr)
+        assert result == expected
+
+    def test_tokenize_numbers_with_multi_char_operators(self):
+        """Test tokenizing numbers with multi-character operators."""
+        expr = "100++200**300"
+        expected = ["100", "++", "200", "**", "300"]
         result = tokenize(expr)
         assert result == expected

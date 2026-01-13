@@ -5,8 +5,9 @@ into a list like
 ["(", "Alpha", "+", "(", "Delta", "+", "(", "Pi", "*", "(", "Beta", "*", "(", "Gamma", "/", "Sigma", ")", ")", ")", ")", ")"]
 
 Supports operators: +, -, *, /, ++, **, //
+Supports multi-digit numbers: 100, 123, etc.
 """
-from string import ascii_letters
+from string import ascii_letters, digits
 
 
 def tokenize(expr: str) -> list[str]:
@@ -17,10 +18,11 @@ def tokenize(expr: str) -> list[str]:
         expr: The expression string to tokenize
         
     Returns:
-        A list of tokens (variables, operators, parentheses, etc.)
+        A list of tokens (variables, operators, parentheses, numbers, etc.)
     """
     tokens = []
     var = ''
+    num = ''
     i = 0
     
     while i < len(expr):
@@ -28,12 +30,26 @@ def tokenize(expr: str) -> list[str]:
         
         if ch in ascii_letters:
             # Accumulate letters into a variable name
+            # If we have accumulated a number, add it first
+            if len(num) > 0:
+                tokens.append(num)
+                num = ''
             var += ch
-        else:
-            # When we hit a non-letter, add any accumulated variable first
+        elif ch in digits:
+            # Accumulate digits into a number
+            # If we have accumulated a variable, add it first
             if len(var) > 0:
                 tokens.append(var)
                 var = ''
+            num += ch
+        else:
+            # When we hit a non-letter, non-digit, add any accumulated variable or number first
+            if len(var) > 0:
+                tokens.append(var)
+                var = ''
+            if len(num) > 0:
+                tokens.append(num)
+                num = ''
             
             # Check for multi-character operators: ++, **, //
             if i + 1 < len(expr):
@@ -49,8 +65,10 @@ def tokenize(expr: str) -> list[str]:
         
         i += 1
     
-    # Add any remaining variable at the end
+    # Add any remaining variable or number at the end
     if len(var) > 0:
         tokens.append(var)
+    if len(num) > 0:
+        tokens.append(num)
     
     return tokens
