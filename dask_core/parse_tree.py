@@ -1,5 +1,5 @@
 """
-ParseTree class + methods (build, evaluate, print)
+ParseTree class + methods (evaluate, print)
 """
 from dask_core.tree_node import TreeNode
 class ParseTree:
