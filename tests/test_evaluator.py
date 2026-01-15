@@ -5,31 +5,22 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from dask_core.tree_node import TreeNode
-import pytest
-
-# Import after other modules to avoid circular import issues
-from dask_core.expression_manager import ExpressionManager
 from dask_core.evaluator import Evaluator
+import pytest
 
 
 class TestEvaluator:
     """Test suite for the Evaluator class."""
 
     @pytest.fixture
-    def expression_manager(self):
-        """Fixture to create an ExpressionManager instance."""
-        return ExpressionManager()
-
-    @pytest.fixture
-    def evaluator(self, expression_manager):
+    def evaluator(self):
         """Fixture to create an Evaluator instance."""
-        return Evaluator(expression_manager)
+        return Evaluator()
 
-    def test_evaluator_init(self, expression_manager):
+    def test_evaluator_init(self):
         """Test Evaluator initialization."""
-        evaluator = Evaluator(expression_manager)
+        evaluator = Evaluator()
         assert evaluator is not None
-        assert evaluator.expression_manager == expression_manager
 
     def test_sum_to_zero(self, evaluator):
         """Test _sum_to() with 0."""

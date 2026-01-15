@@ -1,11 +1,10 @@
 """
 Handles evaluating trees, special ops (++ , //, **)
 """
-from dask_core.expression_manager import ExpressionManager
 from dask_core.tree_node import TreeNode
 class Evaluator:
-    def __init__(self, expression_manager: ExpressionManager):
-        self.expression_manager = expression_manager
+    def __init__(self):
+        pass
 
     def _sum_to(self, n: int) -> int:
         return n * (n + 1) // 2

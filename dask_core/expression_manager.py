@@ -2,6 +2,7 @@
 Manages all expressions (add, modify, lookup, sort)
 """
 from dask_core.parser import ExpressionParser
+from dask_core.expression import DaskExpression
 import re
 class ExpressionManager:
     def __init__(self):
@@ -19,7 +20,7 @@ class ExpressionManager:
         :type expression_str: str
         """
         # expression = self.parser.parse(var_name, expression_str)
-        self.expressions[var_name] = expression_str
+        self.expressions[var_name] = DaskExpression(var_name, expression_str)
         print(self.expressions)
 
     def validate_expression(self, expression:str):

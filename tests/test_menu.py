@@ -41,12 +41,14 @@ def test_menu_run_exit_option(menu):
 
 def test_menu_run_option_1(menu):
     """Test menu option 1 (Add/Modify DASK expression)."""
-    inputs = ['1', '6']
+    # Option 1 requires valid expression input like "a=(1+2)"
+    # It has a validation loop, so we need to provide valid input
+    inputs = ['1', 'a=(1+2)', '6']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
             output = fake_output.getvalue()
-            assert "filler1" in output
+            assert "gonna add into dictionary" in output
             assert "Bye, thanks for using ST1507 DSAA DASK Expression Evaluator" in output
 
 
@@ -57,7 +59,9 @@ def test_menu_run_option_2(menu):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
             output = fake_output.getvalue()
-            assert "filler2" in output
+            # Option 2 just prints a header, no filler text
+            assert "CURRENT EXPRESSIONS:" in output
+            assert "Bye, thanks for using ST1507 DSAA DASK Expression Evaluator" in output
 
 
 def test_menu_run_option_3(menu):
@@ -106,22 +110,24 @@ def test_menu_invalid_input_then_valid(menu):
 
 def test_menu_multiple_options_before_exit(menu):
     """Test that menu can handle multiple options before exiting."""
-    inputs = ['1', '2', '3', '6']
+    # Option 1 needs valid expression, option 2 just shows header, option 3 prints filler3
+    inputs = ['1', 'a=(1+2)', '2', '3', '6']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
             output = fake_output.getvalue()
-            assert "filler1" in output
-            assert "filler2" in output
+            assert "gonna add into dictionary" in output
+            assert "CURRENT EXPRESSIONS:" in output
             assert "filler3" in output
             assert "Bye, thanks for using ST1507 DSAA DASK Expression Evaluator" in output
 
 
 def test_menu_whitespace_handling(menu):
     """Test that menu handles whitespace in input."""
-    inputs = ['  1  ', '  6  ']
+    # Option 1 with whitespace, then needs valid expression, then exit
+    inputs = ['  1  ', 'a=(1+2)', '  6  ']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
             output = fake_output.getvalue()
-            assert "filler1" in output
+            assert "gonna add into dictionary" in output

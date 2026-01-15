@@ -103,9 +103,10 @@ class TestDaskExpression:
         expr.build_tree()
         
         # evaluate() is not implemented, so it should do nothing
-        mock_evaluator = Mock()
-        context = {}
-        result = expr.evaluate(mock_evaluator, context)
+        # Note: evaluate() now only takes evaluator parameter, no context
+        from dask_core.evaluator import Evaluator
+        evaluator = Evaluator()
+        result = expr.evaluate(evaluator)
         assert result is None
 
     def test_dask_expression_value_initialized_as_none(self):
