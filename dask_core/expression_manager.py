@@ -21,7 +21,6 @@ class ExpressionManager:
         """
         # expression = self.parser.parse(var_name, expression_str)
         self.expressions[var_name] = DaskExpression(var_name, expression_str)
-        print(self.expressions)
 
     def validate_expression(self, expression:str):
         valid_operators = {'+', '-', '*', '/', '**', '++', '//'}
@@ -65,6 +64,9 @@ class ExpressionManager:
     
         return '', True, name, expr
         
-
     def get_expression(self):
         pass
+
+    def evaluate_all(self): # re-evaluate all the values for all dask expressions contained within EM
+        for var_name, expr in self.expressions.items():
+            expr.value = expr.evaluate(context=self.expressions)

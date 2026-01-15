@@ -9,7 +9,7 @@ class DaskExpression:
         self.name = var_name
         self.expression = expr
         self.parse_tree: ParseTree = self.build_tree()
-        self.value = None
+        self.value: float | int = self.evaluate()
 
     def build_tree(self, parser = ExpressionParser()):
         self.parse_tree = parser.parse(self.expression)
@@ -23,4 +23,7 @@ class DaskExpression:
         if evaluator is None:
             evaluator = Evaluator()
         return self.parse_tree.evaluate(evaluator, context)
+    
+    def __str__(self):
+        return f'{self.name}={self.expression}=> {self.value}'
     

@@ -1,7 +1,5 @@
 from dask_core.expression_manager import ExpressionManager
 
-EM = ExpressionManager()
-
 class Menu:
     def __init__(self):
         self.option_display = ""
@@ -14,10 +12,9 @@ class Menu:
         self.option_display += "\t6. Exit\n"
         self.option_display += "Enter choice: "
 
-    
+        self.EM = ExpressionManager()
 
-    def run_menu(self):
-        print('''
+        self.title_screen = '''
 *********************************************************
 * ST1507 DSAA: DASK Expression Evaluator                *
 *-------------------------------------------------------*
@@ -28,7 +25,12 @@ class Menu:
 *********************************************************
               
 
-''')
+'''
+
+    
+
+    def run_menu(self):
+        print(self.title_screen)
         while True:
             user_choice = input(self.option_display).strip()
             while user_choice not in ['1','2','3','4','5','6']:
@@ -36,19 +38,11 @@ class Menu:
             
             match user_choice:
                 case '1':
-                    expression = input('Enter the DASK expression you want to add/modify: \nFor example, a=(1+2)\n')
-                    message, result,name,expr = EM.validate_expression(expression)
-                    while True:
-                        if result == False:
-                            expression = input(f'\n{message}: ')
-                            message,result,name,expr = EM.validate_expression(expression)
-                        elif result == True:
-                            print('gonna add into dictionary')
-                            EM.add_expression(name, expr)
-                            break
+                    self.add_modify()
+                    self._wait_for_continue()
                 case '2':
-                    print('''CURRENT EXPRESSIONS:
-********************''')
+                    self.display_current()
+                    self._wait_for_continue()
                     
                 case '3':
                     print('filler3')
@@ -59,4 +53,23 @@ class Menu:
                 case '6':
                     break
         print('\nBye, thanks for using ST1507 DSAA DASK Expression Evaluator')
-            
+    
+    def _wait_for_continue(self):
+        input("Press enter key, to continue....")
+        self.EM.evaluate_all()
+
+    def add_modify(self):
+        expression = input('Enter the DASK expression you want to add/modify: \nFor example, a=(1+2)\n')
+        message, result,name,expr = self.EM.validate_expression(expression)
+        while True:
+            if result == False:
+                expression = input(f'\n{message}: ')
+                message,result,name,expr = self.EM.validate_expression(expression)
+            elif result == True:
+                self.EM.add_expression(name, expr)
+                break
+
+    def display_current(self):
+        print("CURRENT EXPRESSIONS:\n********************")
+        for expression in self.EM.expressions.values():
+            print(expression)

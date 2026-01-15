@@ -40,8 +40,8 @@ class Evaluator:
         :rtype: float | None
         """
         if node.is_leaf():
-            if isinstance(node.value, int):
-                return node.value
+            if node.value.isdigit():
+                return int(node.value)
             else:
                 expression = context[node.value]
                 parse_tree = expression.parse_tree
