@@ -26,9 +26,9 @@ class ExpressionParser:
                 pass
             elif expr[i] == ')':
                 operator = operator_stack.pop()
-                rightnode = node_stack.pop()
                 leftnode = node_stack.pop()
-
+                rightnode = node_stack.pop()
+            
                 subtree = TreeNode(operator, leftnode, rightnode)
                 node_stack.push(subtree)
             elif expr[i] in self.operators:

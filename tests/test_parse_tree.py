@@ -116,6 +116,21 @@ class TestParseTree:
         with pytest.raises((AttributeError, TypeError)):
             tree.print_rotated()
 
+    def test_parse_tree_print_in_order(self):
+        """Test printInOrder() output order and indentation."""
+        root = TreeNode("+", TreeNode("2"), TreeNode("*", TreeNode("4"), TreeNode("5")))
+        tree = ParseTree(root)
+
+        with patch('sys.stdout', new=StringIO()) as fake_output:
+            tree.printInOrder()
+            output = fake_output.getvalue().strip().split('\n')
+
+        assert output[0] == ".2"
+        assert output[1] == "+"
+        assert output[2] == "..4"
+        assert output[3] == ".*"
+        assert output[4] == "..5"
+
     def test_parse_tree_evaluate_complex_expression(self):
         """Test evaluate() with a complex expression tree."""
         # Tree: ((A + B) * C)

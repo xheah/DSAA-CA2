@@ -22,3 +22,14 @@ class ParseTree:
         print("    " * level + str(node.value))
         if node.left:
             self.print_rotated(node.left, level + 1)
+
+    def printInOrder(self, node: TreeNode = None, level: int = 0):
+        if node is None:
+            node = self.root
+        if node is None:
+            return
+        if node.left:
+            self.printInOrder(node.left, level + 1)
+        print(str('.'*level) + str(node.value))
+        if node.right:
+            self.printInOrder(node.right, level + 1)

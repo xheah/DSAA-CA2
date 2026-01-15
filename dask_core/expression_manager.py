@@ -6,8 +6,11 @@ from dask_core.expression import DaskExpression
 import re
 class ExpressionManager:
     def __init__(self):
-        self.expressions = {} # dict[str, DaskExpression]
+        self.expressions: dict[str, DaskExpression] = {} # dict[str, DaskExpression]
         self.parser = ExpressionParser()
+        self.add_expression("Alpha", "(2+(4*5))")
+        self.add_expression("Pi", "(Alpha*3)")
+        self.add_expression("Mango", "((Alpha+(Delta+(Pi*(Beta*(Gamma/Sigma)))))/2)")
 
     def add_expression(self, var_name: str, expression_str: str):
         """

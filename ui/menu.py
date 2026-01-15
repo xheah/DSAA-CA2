@@ -1,4 +1,5 @@
 from dask_core.expression_manager import ExpressionManager
+from time import sleep
 
 class Menu:
     def __init__(self):
@@ -43,9 +44,9 @@ class Menu:
                 case '2':
                     self.display_current()
                     self._wait_for_continue()
-                    
                 case '3':
-                    print('filler3')
+                    self.display_n_evaluate_single()
+                    self._wait_for_continue()
                 case '4':
                     print('filler4')
                 case '5':
@@ -71,5 +72,28 @@ class Menu:
 
     def display_current(self):
         print("CURRENT EXPRESSIONS:\n********************")
-        for expression in self.EM.expressions.values():
+        for name in sorted(self.EM.expressions.keys()):
+            expression = self.EM.expressions[name]
             print(expression)
+
+        sleep(0.5)
+
+    def display_n_evaluate_single(self):
+        while True: 
+            var_name = input("Please enter the variable you want to evaluate:\n")
+            if len(self.EM.expressions) < 1:
+                print("There are currently no variables in this session.")
+                return
+            if var_name not in self.EM.expressions.keys():
+                print("Variable not found!", end='\n\n')
+                sleep(0.5)
+                continue
+            else:
+                print('')
+                break
+        expr = self.EM.expressions[var_name]
+        print('Expression Tree:')
+        expr_tree = expr.parse_tree
+        expr_tree.printInOrder()
+        expr_value = expr.evaluate(context=self.EM.expressions)
+        print(f'Value for variable "{var_name}" is {expr_value}', end='\n\n')

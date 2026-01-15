@@ -63,6 +63,37 @@ def test_menu_run_option_2(menu):
             assert "CURRENT EXPRESSIONS:" in output
             assert "Bye, thanks for using ST1507 DSAA DASK Expression Evaluator" in output
 
+
+def test_menu_option_2_sorts_expressions(menu):
+    """Test option 2 prints expressions in alphabetical order."""
+    inputs = [
+        '1', 'b=(1+2)', '',
+        '1', 'a=(3+4)', '',
+        '2', '',
+        '6',
+    ]
+    with patch('builtins.input', side_effect=inputs):
+        with patch('sys.stdout', new=StringIO()) as fake_output:
+            menu.run_menu()
+            output = fake_output.getvalue()
+
+    a_idx = output.find("a=(3+4)=>")
+    b_idx = output.find("b=(1+2)=>")
+    assert a_idx != -1
+    assert b_idx != -1
+    assert a_idx < b_idx
+
+
+def test_menu_run_option_3(menu):
+    """Test menu option 3 (Evaluate a single DASK variable)."""
+    inputs = ['3', 'Alpha', '', '6']
+    with patch('builtins.input', side_effect=inputs):
+        with patch('sys.stdout', new=StringIO()) as fake_output:
+            menu.run_menu()
+            output = fake_output.getvalue()
+            assert "Expression Tree:" in output
+            assert 'Value for variable "Alpha"' in output
+
 def test_menu_invalid_input_then_valid(menu):
     """Test that menu handles invalid input and prompts again."""
     # Provide invalid inputs followed by valid exit option
@@ -79,14 +110,15 @@ def test_menu_invalid_input_then_valid(menu):
 
 def test_menu_multiple_options_before_exit(menu):
     """Test that menu can handle multiple options before exiting."""
-    # Option 1 needs valid expression, option 2 just shows header, option 3 prints filler3
-    inputs = ['1', 'a=(1+2)', '', '2', '', '3', '6']
+    # Option 1 needs valid expression, option 2 shows header, option 3 evaluates Alpha
+    inputs = ['1', 'a=(1+2)', '', '2', '', '3', 'Alpha', '', '6']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
             output = fake_output.getvalue()
             assert "CURRENT EXPRESSIONS:" in output
-            assert "filler3" in output
+            assert "Expression Tree:" in output
+            assert 'Value for variable "Alpha"' in output
             assert "Bye, thanks for using ST1507 DSAA DASK Expression Evaluator" in output
             assert "a" in menu.EM.expressions
 
