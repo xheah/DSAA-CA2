@@ -58,7 +58,10 @@ class ExpressionManager:
         
         if expr == '':
             return "*Expression cannot be empty. Please re enter the expression*", False, '', ''
-
+        
+        if '(' not in expr or ')' not in expr:
+            return "*Empty parentheses in expression. Please re enter the expression*", False, '', ''   
+    
         return '', True, name, expr
         
 
