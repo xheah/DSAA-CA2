@@ -27,7 +27,7 @@ class ExpressionManager:
 
     def validate_expression(self, expression:str):
         valid_operators = {'+', '-', '*', '/', '**', '++', '//'}
-        allowed_chars = set('0123456789+-*/()=')
+        allowed_chars = set('0123456789+-*/()=.')
 
         if '=' not in expression:
             return "*Missing '=' sign in expression. Please re enter the expression*", False, '', ''
@@ -58,6 +58,13 @@ class ExpressionManager:
         
         if re.search(r'^[+\-*/^]\s*', expr):
             return "*Expression cannot start with an operator. Please re enter the expression*", False, '', ''
+
+        if re.search(r'(^|[=(*/+])\s*-\s*[\d\.]', expr):
+            return "*Negative numbers are not allowed. Please re enter the expression*", False, '', ''
+
+        for number in re.findall(r'[\d\.]+', expr):
+            if not re.fullmatch(r'(\d+(\.\d*)?|\.\d+)', number):
+                return "*Invalid number format. Please re enter the expression*", False, '', ''
         
         if expr == '':
             return "*Expression cannot be empty. Please re enter the expression*", False, '', ''

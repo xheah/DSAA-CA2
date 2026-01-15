@@ -42,6 +42,22 @@ def tokenize(expr: str) -> list[str]:
                 tokens.append(var)
                 var = ''
             num += ch
+        elif ch == '.':
+            # Handle decimal numbers
+            next_is_digit = i + 1 < len(expr) and expr[i + 1] in digits
+            if len(var) > 0:
+                tokens.append(var)
+                var = ''
+            if len(num) == 0 and next_is_digit:
+                num = '0.'
+            elif len(num) > 0 and '.' not in num:
+                num += '.'
+            else:
+                # Treat as a standalone token if it doesn't belong to a number
+                if len(num) > 0:
+                    tokens.append(num)
+                    num = ''
+                tokens.append(ch)
         else:
             # When we hit a non-letter, non-digit, add any accumulated variable or number first
             if len(var) > 0:

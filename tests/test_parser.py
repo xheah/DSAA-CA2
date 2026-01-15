@@ -133,6 +133,13 @@ class TestLexer:
         result = tokenize(expr)
         assert result == expected
 
+    def test_tokenize_decimal_numbers(self):
+        """Test tokenizing expression with decimal numbers."""
+        expr = "Alpha1.5+Beta0.25"
+        expected = ["Alpha", "1.5", "+", "Beta", "0.25"]
+        result = tokenize(expr)
+        assert result == expected
+
     def test_tokenize_mixed_case_variables(self):
         """Test tokenizing mixed case variable names."""
         expr = "Alpha+BeTa+GaMmA"

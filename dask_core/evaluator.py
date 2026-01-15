@@ -1,13 +1,14 @@
 """
 Handles evaluating trees, special ops (++ , //, **)
 """
+import re
 from dask_core.tree_node import TreeNode
 class Evaluator:
     def __init__(self):
         pass
 
-    def _sum_to(self, n: int) -> int:
-        return n * (n + 1) // 2
+    def _sum_to(self, n: float) -> float:
+        return n * (n + 1) / 2
     
     def _apply_operator(self, op, left_val, right_val):
         if left_val is None or right_val is None:
@@ -39,12 +40,13 @@ class Evaluator:
         :return: Description
         :rtype: float | None
         """
+        number_re = re.compile(r'(\d+(\.\d*)?|\.\d+)$')
         if node.is_leaf():
             if isinstance(node.value, (int, float)):
                 return node.value
             if isinstance(node.value, str):
-                if node.value.isdigit() or (node.value.startswith("-") and node.value[1:].isdigit()):
-                    return int(node.value)
+                if number_re.fullmatch(node.value):
+                    return float(node.value)
                 if context is None:
                     return None
                 if node.value not in context:

@@ -71,3 +71,19 @@ class TestExpressionManager:
         assert manager.expressions["a"].expression == "(3+4)"
         assert manager.expressions["a"].value == 7
         assert first_value != manager.expressions["a"].value
+
+    def test_validate_expression_allows_decimals(self):
+        """Test that decimal operands are accepted."""
+        manager = ExpressionManager()
+        message, result, name, expr = manager.validate_expression("a=(1.5+2.25)")
+        assert result is True
+        assert message == ""
+        assert name == "a"
+        assert expr == "(1.5+2.25)"
+
+    def test_validate_expression_rejects_negative_numbers(self):
+        """Test that negative numbers are rejected."""
+        manager = ExpressionManager()
+        message, result, _, _ = manager.validate_expression("a=(-1+2)")
+        assert result is False
+        assert "Negative numbers" in message

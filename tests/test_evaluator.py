@@ -108,6 +108,13 @@ class TestEvaluator:
         result = evaluator.eval_node(node, context)
         assert result == 5
 
+    def test_eval_node_leaf_float_string(self, evaluator):
+        """Test eval_node() with a leaf node containing a float string."""
+        node = TreeNode("3.5")
+        context = {}
+        result = evaluator.eval_node(node, context)
+        assert result == 3.5
+
     def test_eval_node_leaf_string(self, evaluator):
         """Test eval_node() with a leaf node containing a string variable."""
         # Create a mock expression for the context
