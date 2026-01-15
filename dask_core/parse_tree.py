@@ -2,11 +2,12 @@
 ParseTree class + methods (evaluate, print)
 """
 from dask_core.tree_node import TreeNode
+from dask_core.evaluator import Evaluator
 class ParseTree:
     def __init__(self, root=None):
         self.root = root
     
-    def evaluate(self, evaluator, context):
+    def evaluate(self, evaluator = Evaluator(), context = None):
         if self.root is None:
             return None
         
