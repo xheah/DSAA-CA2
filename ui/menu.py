@@ -1,3 +1,7 @@
+from dask_core.expression_manager import ExpressionManager
+
+EM = ExpressionManager()
+
 class Menu:
     def __init__(self):
         self.option_display = ""
@@ -32,9 +36,20 @@ class Menu:
             
             match user_choice:
                 case '1':
-                    print('filler1')
+                    expression = input('Enter the DASK expression you want to add/modify: \nFor example, a=(1+2)\n')
+                    message, result,name,expr = EM.validate_expression(expression)
+                    while True:
+                        if result == False:
+                            expression = input(f'\n{message}: ')
+                            message,result,name,expr = EM.validate_expression(expression)
+                        elif result == True:
+                            print('gonna add into dictionary')
+                            EM.add_expression(name, expr)
+                            break
                 case '2':
-                    print('filler2')
+                    print('''CURRENT EXPRESSIONS:
+********************''')
+                    
                 case '3':
                     print('filler3')
                 case '4':
@@ -44,11 +59,4 @@ class Menu:
                 case '6':
                     break
         print('\nBye, thanks for using ST1507 DSAA DASK Expression Evaluator')
-
-
-
-                   
-
-        
-
             
