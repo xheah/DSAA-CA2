@@ -5,7 +5,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from dask_core.expression_manager import ExpressionManager
-from dask_core.expression import DaskExpression
 import pytest
 
 
@@ -68,3 +67,27 @@ class TestExpressionManager:
         except (TypeError, AttributeError):
             pytest.skip("ExpressionManager initialization issue")
 
+    def test_expression_manager_evaluates_with_existing_variables(self):
+        """Test evaluating a=(c+d) when c and d exist in ExpressionManager."""
+        manager = ExpressionManager()
+        manager.add_expression("c", "5")
+        manager.add_expression("d", "3")
+        manager.add_expression("a", "(c+d)")
+
+        manager.evaluate_all()
+
+        assert manager.expressions["a"].value == 8
+
+    def test_expression_manager_modify_existing_expression(self):
+        """Test modifying an existing expression overwrites the old one."""
+        manager = ExpressionManager()
+        manager.add_expression("a", "(1+2)")
+        manager.evaluate_all()
+        first_value = manager.expressions["a"].value
+
+        manager.add_expression("a", "(3+4)")
+        manager.evaluate_all()
+
+        assert manager.expressions["a"].expression == "(3+4)"
+        assert manager.expressions["a"].value == 7
+        assert first_value != manager.expressions["a"].value

@@ -123,19 +123,8 @@ class TestEvaluator:
         context = {"Alpha": expr, "X": expr_x, "Y": expr_y}
         
         node = TreeNode("Alpha")
-        # Note: There's a bug in eval_node - it doesn't return the result
-        # when evaluating a variable leaf node (line 50 doesn't return)
-        # Also, numbers in parse tree are strings, so they need to be in context
-        # This test documents the current behavior
-        # The function will try to evaluate but may fail due to missing context
-        # or return None due to missing return statement
-        try:
-            result = evaluator.eval_node(node, context)
-            # If it doesn't raise an error, result should be None due to bug
-            assert result is None
-        except (KeyError, AttributeError):
-            # Expected if nested variables aren't properly handled
-            pass
+        result = evaluator.eval_node(node, context)
+        assert result == 8
 
     def test_eval_node_operator_addition(self, evaluator):
         """Test eval_node() with an addition operator."""
@@ -207,30 +196,23 @@ class TestEvaluator:
     def test_eval_node_with_variable_reference(self, evaluator):
         """Test eval_node() with variable references in context."""
         from dask_core.expression import DaskExpression
-        
-        # Note: Numbers in parse tree are stored as strings, not integers
-        # The evaluator checks isinstance(node.value, int) first, but since
-        # numbers are strings, it tries to look them up in context, causing KeyError
-        # 
-        # To test variable references properly, we need expressions that use
-        # other variables, not numbers. But even then, the evaluator has a bug
-        # where it doesn't return the result when evaluating a variable (line 50)
-        
-        # Create expressions using only variables (no numbers)
-        # But we still need to provide values for the leaf variables
-        # Since numbers are strings, we can't easily test this without
-        # the evaluator being fixed to handle string numbers
-        
-        # This test documents the limitation: numbers in parse tree are strings
-        # and the evaluator doesn't handle them correctly
+
         expr_a = DaskExpression("A", "(X+Y)")
         expr_b = DaskExpression("B", "(Z*W)")
-        
-        # Create leaf expressions - but these will have string numbers which cause KeyError
-        # So we skip this test or expect it to fail
-        with pytest.raises(KeyError):
-            # The evaluator will try to look up string numbers in context
-            context = {"A": expr_a, "B": expr_b}
-            node = TreeNode("+", TreeNode("A"), TreeNode("B"))
-            evaluator.eval_node(node, context)
+
+        context = {"A": expr_a, "B": expr_b}
+        node = TreeNode("+", TreeNode("A"), TreeNode("B"))
+        result = evaluator.eval_node(node, context)
+        assert result is None
+
+    def test_eval_node_missing_variables_returns_none(self, evaluator):
+        """Test eval_node() returns None when variables are missing."""
+        from dask_core.expression import DaskExpression
+
+        expr_a = DaskExpression("A", "(C+D)")
+        context = {"A": expr_a}
+        node = TreeNode("A")
+
+        result = evaluator.eval_node(node, context)
+        assert result is None
 

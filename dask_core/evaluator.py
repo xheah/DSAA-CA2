@@ -40,14 +40,24 @@ class Evaluator:
         :rtype: float | None
         """
         if node.is_leaf():
-            if node.value.isdigit():
-                return int(node.value)
-            else:
+            if isinstance(node.value, (int, float)):
+                return node.value
+            if isinstance(node.value, str):
+                if node.value.isdigit() or (node.value.startswith("-") and node.value[1:].isdigit()):
+                    return int(node.value)
+                if context is None:
+                    return None
+                if node.value not in context:
+                    return None
                 expression = context[node.value]
-                parse_tree = expression.parse_tree
-                node = parse_tree.root
-                self.eval_node(node, context)
-                
-        else:
-            return self._apply_operator(node.value, self.eval_node(node.left, context), self.eval_node(node.right, context))
+                if expression.parse_tree is None or expression.parse_tree.root is None:
+                    return None
+                return self.eval_node(expression.parse_tree.root, context)
+            return None
+
+        return self._apply_operator(
+            node.value,
+            self.eval_node(node.left, context),
+            self.eval_node(node.right, context),
+        )
 
