@@ -125,11 +125,11 @@ class TestParseTree:
             tree.printInOrder()
             output = fake_output.getvalue().strip().split('\n')
 
-        assert output[0] == ".2"
-        assert output[1] == "+"
+        assert output[0] == "..5"
+        assert output[1] == ".*"
         assert output[2] == "..4"
-        assert output[3] == ".*"
-        assert output[4] == "..5"
+        assert output[3] == "+"
+        assert output[4] == ".2"
 
     def test_parse_tree_evaluate_complex_expression(self):
         """Test evaluate() with a complex expression tree."""

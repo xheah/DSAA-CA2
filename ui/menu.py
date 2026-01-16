@@ -1,5 +1,6 @@
 from dask_core.expression_manager import ExpressionManager
 from time import sleep
+from io_utils.file_handler import FileHandler
 
 class Menu:
     def __init__(self):
@@ -100,4 +101,31 @@ class Menu:
         print(f'Value for variable "{var_name}" is {expr_value}', end='\n\n')
 
     def read_from_file(self):
-        pass
+        file_handler = FileHandler()
+
+        file_contents = file_handler.read_file()
+        file_expressions = file_contents.split('\n')
+        
+        validity: bool = True
+        parsed_expressions = {}
+        for expression in file_expressions:
+            (err_msg, validity, name, expr) = self.EM.validate_expression(expression)
+            parsed_expressions[name] = expr
+            if not validity:
+                print(err_msg)
+                print(validity)
+                print(name)
+                print(expr)
+                break
+
+        if not validity:
+            print('There is an invalid expression in the file provided.\nPlease try again later.')
+
+            return
+
+        for name, expr in parsed_expressions.items():
+            self.EM.add_expression(name, expr)
+        print('')
+        self.EM.evaluate_all()
+        self.display_current()
+        print('\n\n')

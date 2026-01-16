@@ -159,7 +159,7 @@ class TestEvaluator:
         node = TreeNode("/", TreeNode(15), TreeNode(3))
         context = {}
         result = evaluator.eval_node(node, context)
-        assert result == 5.0
+        assert result == 5
 
     def test_eval_node_operator_double_plus(self, evaluator):
         """Test eval_node() with ++ operator."""
@@ -173,7 +173,7 @@ class TestEvaluator:
         node = TreeNode("//", TreeNode(3), TreeNode(2))
         context = {}
         result = evaluator.eval_node(node, context)
-        assert result == 2.0  # sum_to(3) / sum_to(2) = 6 / 3 = 2.0
+        assert result == 2  # sum_to(3) / sum_to(2) = 6 / 3 = 2
 
     def test_eval_node_operator_double_star(self, evaluator):
         """Test eval_node() with ** operator."""
@@ -198,7 +198,15 @@ class TestEvaluator:
                         TreeNode("/", TreeNode(20), TreeNode(4)))
         context = {}
         result = evaluator.eval_node(node, context)
-        assert result == 75.0  # (10 + 5) * (20 / 4) = 15 * 5 = 75
+        assert result == 75  # (10 + 5) * (20 / 4) = 15 * 5 = 75
+
+    def test_eval_node_normalizes_whole_float_result(self, evaluator):
+        """Test that whole-number float results normalize to int."""
+        node = TreeNode("+", TreeNode("1.5"), TreeNode("1.5"))
+        context = {}
+        result = evaluator.eval_node(node, context)
+        assert result == 3
+        assert isinstance(result, int)
 
     def test_eval_node_with_variable_reference(self, evaluator):
         """Test eval_node() with variable references in context."""

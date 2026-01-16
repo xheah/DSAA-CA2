@@ -28,8 +28,8 @@ class ParseTree:
             node = self.root
         if node is None:
             return
-        if node.left:
-            self.printInOrder(node.left, level + 1)
-        print(str('.'*level) + str(node.value))
         if node.right:
             self.printInOrder(node.right, level + 1)
+        print(str('.'*level) + str(node.value))
+        if node.left:
+            self.printInOrder(node.left, level + 1)

@@ -59,24 +59,24 @@ class TestDaskExpression:
         expr = DaskExpression("Alpha", "(5+3)")
         expr.build_tree()
         assert expr.parse_tree.root.value == "+"
-        assert expr.parse_tree.root.right.value == "5"
-        assert expr.parse_tree.root.left.value == "3"
+        assert expr.parse_tree.root.left.value == "5"
+        assert expr.parse_tree.root.right.value == "3"
 
     def test_dask_expression_build_tree_complex_expression(self):
         """Test build_tree() with a complex expression."""
         expr = DaskExpression("Beta", "(A+(B*C))")
         expr.build_tree()
         assert expr.parse_tree.root.value == "+"
-        assert expr.parse_tree.root.right.value == "A"
-        assert expr.parse_tree.root.left.value == "*"
+        assert expr.parse_tree.root.left.value == "A"
+        assert expr.parse_tree.root.right.value == "*"
 
     def test_dask_expression_build_tree_with_numbers(self):
         """Test build_tree() with numbers in expression."""
         expr = DaskExpression("Gamma", "(100+200)")
         expr.build_tree()
         assert expr.parse_tree.root.value == "+"
-        assert expr.parse_tree.root.right.value == "100"
-        assert expr.parse_tree.root.left.value == "200"
+        assert expr.parse_tree.root.left.value == "100"
+        assert expr.parse_tree.root.right.value == "200"
 
     def test_dask_expression_build_tree_with_multi_char_operators(self):
         """Test build_tree() with multi-character operators."""

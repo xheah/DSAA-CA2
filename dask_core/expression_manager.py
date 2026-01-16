@@ -8,9 +8,9 @@ class ExpressionManager:
     def __init__(self):
         self.expressions: dict[str, DaskExpression] = {} # dict[str, DaskExpression]
         self.parser = ExpressionParser()
-        self.add_expression("Alpha", "(2+(4*5))")
-        self.add_expression("Pi", "(Alpha*3)")
-        self.add_expression("Mango", "((Alpha+(Delta+(Pi*(Beta*(Gamma/Sigma)))))/2)")
+        # self.add_expression("Alpha", "(2+(4*5))")
+        # self.add_expression("Pi", "(Alpha*3)")
+        # self.add_expression("Mango", "((Alpha+(Delta+(Pi*(Beta*(Gamma/Sigma)))))/2)")
 
     def add_expression(self, var_name: str, expression_str: str):
         """
@@ -38,7 +38,7 @@ class ExpressionManager:
         """
         valid_operators = {'+', '-', '*', '/', '**', '++', '//'}
         allowed_chars = set('0123456789+-*/()=.')
-
+        expression = expression.strip()
         if '=' not in expression:
             return "*Missing '=' sign in expression. Please re enter the expression*", False, '', ''
         

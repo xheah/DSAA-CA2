@@ -86,7 +86,7 @@ def test_menu_option_2_sorts_expressions(menu):
 
 def test_menu_run_option_3(menu):
     """Test menu option 3 (Evaluate a single DASK variable)."""
-    inputs = ['3', 'Alpha', '', '6']
+    inputs = ['1', 'Alpha=(3+5)', '', '3', 'Alpha', '', '6']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
@@ -111,14 +111,14 @@ def test_menu_invalid_input_then_valid(menu):
 def test_menu_multiple_options_before_exit(menu):
     """Test that menu can handle multiple options before exiting."""
     # Option 1 needs valid expression, option 2 shows header, option 3 evaluates Alpha
-    inputs = ['1', 'a=(1+2)', '', '2', '', '3', 'Alpha', '', '6']
+    inputs = ['1', 'a=(1+2)', '', '2', '', '3', 'a', '', '6']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
             output = fake_output.getvalue()
             assert "CURRENT EXPRESSIONS:" in output
             assert "Expression Tree:" in output
-            assert 'Value for variable "Alpha"' in output
+            assert 'Value for variable "a"' in output
             assert "Bye, thanks for using ST1507 DSAA DASK Expression Evaluator" in output
             assert "a" in menu.EM.expressions
 
