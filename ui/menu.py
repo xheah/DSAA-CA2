@@ -11,7 +11,9 @@ class Menu:
         self.option_display += "\t3. Evaluate a single DASK variable\n"
         self.option_display += "\t4. Read DASK expression from file\n"
         self.option_display += "\t5. Sort DASK expressions\n"
-        self.option_display += "\t6. Exit\n"
+        self.option_display += "\t6. Optimise Expressions and Cost Anaylsis (Aden)"
+        self.option_display += "\t7. Symbolic Differentiation (Aden)"
+        self.option_display += "\t8. Exit\n"
         self.option_display += "Enter choice: "
 
         self.EM = ExpressionManager()
@@ -35,7 +37,7 @@ class Menu:
         print(self.title_screen)
         while True:
             user_choice = input(self.option_display).strip()
-            while user_choice not in ['1','2','3','4','5','6']:
+            while user_choice not in ['1','2','3','4','5','6', '7', '8']:
                 user_choice = input(f'\n*PLEASE ENTER A VALID NUMBER*\n{self.option_display}')
             
             match user_choice:
@@ -54,6 +56,10 @@ class Menu:
                 case '5':
                     print('filler5')
                 case '6':
+                    print("Optimise Expressions and Cost Analysis")
+                case '7':
+                    print("Symbolic Differentiation")
+                case '8':
                     break
         print('\nBye, thanks for using ST1507 DSAA DASK Expression Evaluator')
     
@@ -129,3 +135,5 @@ class Menu:
         self.EM.evaluate_all()
         self.display_current()
         print('\n\n')
+    def optimise_cost(self):
+        pass
