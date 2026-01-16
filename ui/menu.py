@@ -48,7 +48,8 @@ class Menu:
                     self.display_n_evaluate_single()
                     self._wait_for_continue()
                 case '4':
-                    print('filler4')
+                    self.read_from_file()
+                    self._wait_for_continue()
                 case '5':
                     print('filler5')
                 case '6':
@@ -97,3 +98,6 @@ class Menu:
         expr_tree.printInOrder()
         expr_value = expr.evaluate(context=self.EM.expressions)
         print(f'Value for variable "{var_name}" is {expr_value}', end='\n\n')
+
+    def read_from_file(self):
+        pass
