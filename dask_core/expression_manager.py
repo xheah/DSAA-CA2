@@ -91,5 +91,9 @@ class ExpressionManager:
         pass
 
     def evaluate_all(self): # re-evaluate all the values for all dask expressions contained within EM
-        for var_name, expr in self.expressions.items():
+        for expr in self.expressions.values():
             expr.value = expr.evaluate(context=self.expressions)
+        
+    def optimise_all(self):
+        for expr in self.expressions.values():
+            expr.parse_tree.optimise()
