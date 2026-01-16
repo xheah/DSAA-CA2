@@ -25,7 +25,17 @@ class ExpressionManager:
         # expression = self.parser.parse(var_name, expression_str)
         self.expressions[var_name] = DaskExpression(var_name, expression_str)
 
-    def validate_expression(self, expression:str):
+    def validate_expression(self, expression:str) -> tuple:
+        """
+        Validate whether an expression fits all the conventions of a DASK Expression.
+        
+        :param self: EM
+        :param expression: Dask Expression
+        :type expression: str
+        
+        Returns:
+            tuple: error message, boolean of whether valid, var_name, var_expression
+        """
         valid_operators = {'+', '-', '*', '/', '**', '++', '//'}
         allowed_chars = set('0123456789+-*/()=.')
 
