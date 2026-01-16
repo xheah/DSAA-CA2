@@ -11,8 +11,8 @@ class Menu:
         self.option_display += "\t3. Evaluate a single DASK variable\n"
         self.option_display += "\t4. Read DASK expression from file\n"
         self.option_display += "\t5. Sort DASK expressions\n"
-        self.option_display += "\t6. Optimise Expressions and Cost Anaylsis (Aden)"
-        self.option_display += "\t7. Symbolic Differentiation (Aden)"
+        self.option_display += "\t6. Optimise Expressions and Cost Anaylsis (Aden)\n"
+        self.option_display += "\t7. Symbolic Differentiation (Aden)\n"
         self.option_display += "\t8. Exit\n"
         self.option_display += "Enter choice: "
 
@@ -56,9 +56,17 @@ class Menu:
                 case '5':
                     print('filler5')
                 case '6':
-                    print("Optimise Expressions and Cost Analysis")
+                    self.EM.optimise_all()
+                    print('Optimising expressions...')
+                    sleep(1)
+                    for var_name, expr in self.EM.expressions.items():
+                        print(var_name + '\n' + '*'*20)
+                        expr.parse_tree.display_optimised_root()
+                        print('-' * 20)
+                    self._wait_for_continue()
                 case '7':
                     print("Symbolic Differentiation")
+                    self._wait_for_continue()
                 case '8':
                     break
         print('\nBye, thanks for using ST1507 DSAA DASK Expression Evaluator')

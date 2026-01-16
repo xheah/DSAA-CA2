@@ -59,9 +59,13 @@ class Evaluator:
                 if node.value not in context:
                     return None
                 expression = context[node.value]
-                if expression.parse_tree is None or expression.parse_tree.root is None:
+                if expression.parse_tree is None:
                     return None
-                return self.eval_node(expression.parse_tree.root, context)
+                parse_tree = expression.parse_tree
+                root = parse_tree.optimised_root if parse_tree.optimised_root is not None else parse_tree.original_root
+                if root is None:
+                    return None
+                return self.eval_node(root, context)
             return None
 
         return self._apply_operator(

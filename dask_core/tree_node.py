@@ -12,3 +12,21 @@ class TreeNode:
     
     def is_operator(self):
         return self.value in {"+", "-", "*", "/", "**", "++", "//"}
+
+    def is_number(self):
+        num = isinstance(self.value, (int, float))
+        if isinstance(self.value, str):
+            try:
+                float(self.value)
+                num_str = True
+            except ValueError:
+                num_str = False
+        else:
+            num_str = False
+        return num or num_str
+    
+    def is_variable(self):
+        if isinstance(self.value, str):
+            return self.value.isalpha()
+        
+        return False
