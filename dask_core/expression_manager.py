@@ -94,3 +94,6 @@ class ExpressionManager:
     def optimise_all(self):
         for expr in self.expressions.values():
             expr.parse_tree.optimise()
+
+    def optimise_expression(self, var_name: str):
+        self.expressions[var_name].parse_tree.optimise()

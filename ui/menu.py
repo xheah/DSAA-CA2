@@ -56,13 +56,7 @@ class Menu:
                 case '5':
                     print('filler5')
                 case '6':
-                    self.EM.optimise_all()
-                    print('Optimising expressions...')
-                    sleep(1)
-                    for var_name, expr in self.EM.expressions.items():
-                        print(var_name + '\n' + '*'*20)
-                        expr.parse_tree.display_optimised_root()
-                        print('-' * 20)
+                    self.optimise_cost()
                     self._wait_for_continue()
                 case '7':
                     print("Symbolic Differentiation")
@@ -143,5 +137,19 @@ class Menu:
         self.EM.evaluate_all()
         self.display_current()
         print('\n\n')
+
     def optimise_cost(self):
-        pass
+        while True:
+            var_name = input("Please enter the expression you would like to optimise: ").strip()
+            if var_name not in self.EM.expressions.keys():
+                print('Expression does not exist! Please try again.\n')     
+                sleep(0.5)
+            else:
+                break
+        self.EM.optimise_expression(var_name)
+        print(f"Optimising {var_name}...\n")
+        sleep(0.5)
+        
+    
+    def print_cost_analysis_report(self, var_name: str):
+        pass 
