@@ -25,13 +25,15 @@ def test_menu_init(menu):
     assert "3. Evaluate a single DASK variable" in menu.option_display
     assert "4. Read DASK expression from file" in menu.option_display
     assert "5. Sort DASK expressions" in menu.option_display
-    assert "6. Exit" in menu.option_display
+    assert "6. Optimise Expressions and Cost Anaylsis" in menu.option_display
+    assert "7. Symbolic Differentiation" in menu.option_display
+    assert "8. Exit" in menu.option_display
     assert "Enter choice:" in menu.option_display
 
 
 def test_menu_run_exit_option(menu):
     """Test that menu exits when option 6 is selected."""
-    with patch('builtins.input', return_value='6'):
+    with patch('builtins.input', return_value='8'):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
             output = fake_output.getvalue()
@@ -43,7 +45,7 @@ def test_menu_run_option_1(menu):
     """Test menu option 1 (Add/Modify DASK expression)."""
     # Option 1 requires valid expression input like "a=(1+2)"
     # It has a validation loop, so we need to provide valid input
-    inputs = ['1', 'a=(1+2)', '', '6']
+    inputs = ['1', 'a=(1+2)', '', '8']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
@@ -54,7 +56,7 @@ def test_menu_run_option_1(menu):
 
 def test_menu_run_option_2(menu):
     """Test menu option 2 (Display current DASK expression)."""
-    inputs = ['2', '', '6']
+    inputs = ['2', '', '8']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
@@ -70,7 +72,7 @@ def test_menu_option_2_sorts_expressions(menu):
         '1', 'b=(1+2)', '',
         '1', 'a=(3+4)', '',
         '2', '',
-        '6',
+        '8',
     ]
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
@@ -86,7 +88,7 @@ def test_menu_option_2_sorts_expressions(menu):
 
 def test_menu_run_option_3(menu):
     """Test menu option 3 (Evaluate a single DASK variable)."""
-    inputs = ['3', 'Alpha', '', '6']
+    inputs = ['1', 'Alpha=(3+5)', '', '3', 'Alpha', '', '8']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
@@ -97,7 +99,7 @@ def test_menu_run_option_3(menu):
 def test_menu_invalid_input_then_valid(menu):
     """Test that menu handles invalid input and prompts again."""
     # Provide invalid inputs followed by valid exit option
-    inputs = ['invalid', '7', 'abc', '6']
+    inputs = ['invalid', '9', 'abc', '8']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
@@ -111,14 +113,14 @@ def test_menu_invalid_input_then_valid(menu):
 def test_menu_multiple_options_before_exit(menu):
     """Test that menu can handle multiple options before exiting."""
     # Option 1 needs valid expression, option 2 shows header, option 3 evaluates Alpha
-    inputs = ['1', 'a=(1+2)', '', '2', '', '3', 'Alpha', '', '6']
+    inputs = ['1', 'a=(1+2)', '', '2', '', '3', 'a', '', '8']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
             output = fake_output.getvalue()
             assert "CURRENT EXPRESSIONS:" in output
             assert "Expression Tree:" in output
-            assert 'Value for variable "Alpha"' in output
+            assert 'Value for variable "a"' in output
             assert "Bye, thanks for using ST1507 DSAA DASK Expression Evaluator" in output
             assert "a" in menu.EM.expressions
 
@@ -126,7 +128,7 @@ def test_menu_multiple_options_before_exit(menu):
 def test_menu_whitespace_handling(menu):
     """Test that menu handles whitespace in input."""
     # Option 1 with whitespace, then needs valid expression, then exit
-    inputs = ['  1  ', 'a=(1+2)', '', '  6  ']
+    inputs = ['  1  ', 'a=(1+2)', '', '  8  ']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()

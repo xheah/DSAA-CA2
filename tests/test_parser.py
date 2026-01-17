@@ -372,34 +372,34 @@ class TestParser:
         expr = "(A+B)"
         tree = parser.parse(expr)
         assert tree is not None
-        assert tree.root is not None
-        assert tree.root.value == "+"
-        assert tree.root.right.value == "A"
-        assert tree.root.left.value == "B"
+        assert tree.original_root is not None
+        assert tree.original_root.value == "+"
+        assert tree.original_root.left.value == "A"
+        assert tree.original_root.right.value == "B"
 
     def test_parse_simple_subtraction(self, parser):
         """Test parsing a simple subtraction expression."""
         expr = "(A-B)"
         tree = parser.parse(expr)
-        assert tree.root.value == "-"
-        assert tree.root.right.value == "A"
-        assert tree.root.left.value == "B"
+        assert tree.original_root.value == "-"
+        assert tree.original_root.left.value == "A"
+        assert tree.original_root.right.value == "B"
 
     def test_parse_simple_multiplication(self, parser):
         """Test parsing a simple multiplication expression."""
         expr = "(A*B)"
         tree = parser.parse(expr)
-        assert tree.root.value == "*"
-        assert tree.root.right.value == "A"
-        assert tree.root.left.value == "B"
+        assert tree.original_root.value == "*"
+        assert tree.original_root.left.value == "A"
+        assert tree.original_root.right.value == "B"
 
     def test_parse_simple_division(self, parser):
         """Test parsing a simple division expression."""
         expr = "(A/B)"
         tree = parser.parse(expr)
-        assert tree.root.value == "/"
-        assert tree.root.right.value == "A"
-        assert tree.root.left.value == "B"
+        assert tree.original_root.value == "/"
+        assert tree.original_root.left.value == "A"
+        assert tree.original_root.right.value == "B"
 
     def test_parse_nested_expression(self, parser):
         """Test parsing a nested expression."""
@@ -407,39 +407,39 @@ class TestParser:
         # The parser expects one set of parentheses per operation
         expr = "(A+B)"
         tree = parser.parse(expr)
-        assert tree.root.value == "+"
-        assert tree.root.right.value == "A"
-        assert tree.root.left.value == "B"
+        assert tree.original_root.value == "+"
+        assert tree.original_root.left.value == "A"
+        assert tree.original_root.right.value == "B"
 
     def test_parse_complex_nested_expression(self, parser):
         """Test parsing a complex nested expression."""
         expr = "(A+(B*C))"
         tree = parser.parse(expr)
-        assert tree.root.value == "+"
-        assert tree.root.right.value == "A"
-        assert tree.root.left.value == "*"
-        assert tree.root.left.right.value == "B"
-        assert tree.root.left.left.value == "C"
+        assert tree.original_root.value == "+"
+        assert tree.original_root.left.value == "A"
+        assert tree.original_root.right.value == "*"
+        assert tree.original_root.right.left.value == "B"
+        assert tree.original_root.right.right.value == "C"
 
     def test_parse_deeply_nested_expression(self, parser):
         """Test parsing a deeply nested expression."""
         expr = "(A+(B*(C/D)))"
         tree = parser.parse(expr)
-        assert tree.root.value == "+"
-        assert tree.root.right.value == "A"
-        assert tree.root.left.value == "*"
-        assert tree.root.left.right.value == "B"
-        assert tree.root.left.left.value == "/"
-        assert tree.root.left.left.right.value == "C"
-        assert tree.root.left.left.left.value == "D"
+        assert tree.original_root.value == "+"
+        assert tree.original_root.left.value == "A"
+        assert tree.original_root.right.value == "*"
+        assert tree.original_root.right.left.value == "B"
+        assert tree.original_root.right.right.value == "/"
+        assert tree.original_root.right.right.left.value == "C"
+        assert tree.original_root.right.right.right.value == "D"
 
     def test_parse_with_numbers(self, parser):
         """Test parsing expressions with numbers."""
         expr = "(100+200)"
         tree = parser.parse(expr)
-        assert tree.root.value == "+"
-        assert tree.root.right.value == "100"
-        assert tree.root.left.value == "200"
+        assert tree.original_root.value == "+"
+        assert tree.original_root.left.value == "100"
+        assert tree.original_root.right.value == "200"
 
     def test_parse_numbers_and_variables(self, parser):
         """Test parsing expressions with numbers and variables."""
@@ -449,129 +449,129 @@ class TestParser:
         # it pops the last two nodes (Beta, 200) and the operator (+)
         expr = "(Alpha100+Beta200)"
         tree = parser.parse(expr)
-        assert tree.root.value == "+"
+        assert tree.original_root.value == "+"
         # The parser's behavior with adjacent tokens may not match expected structure
         # This test verifies it at least creates a tree with the operator
-        assert tree.root.is_operator()
+        assert tree.original_root.is_operator()
         # For a simpler case, test with separated tokens
         expr2 = "(Alpha+100)"
         tree2 = parser.parse(expr2)
-        assert tree2.root.value == "+"
-        assert tree2.root.right.value == "Alpha"
-        assert tree2.root.left.value == "100"
+        assert tree2.original_root.value == "+"
+        assert tree2.original_root.left.value == "Alpha"
+        assert tree2.original_root.right.value == "100"
 
     def test_parse_multi_char_operator_plus_plus(self, parser):
         """Test parsing with ++ operator."""
         expr = "(A++B)"
         tree = parser.parse(expr)
-        assert tree.root.value == "++"
-        assert tree.root.right.value == "A"
-        assert tree.root.left.value == "B"
+        assert tree.original_root.value == "++"
+        assert tree.original_root.left.value == "A"
+        assert tree.original_root.right.value == "B"
 
     def test_parse_multi_char_operator_star_star(self, parser):
         """Test parsing with ** operator."""
         expr = "(A**B)"
         tree = parser.parse(expr)
-        assert tree.root.value == "**"
-        assert tree.root.right.value == "A"
-        assert tree.root.left.value == "B"
+        assert tree.original_root.value == "**"
+        assert tree.original_root.left.value == "A"
+        assert tree.original_root.right.value == "B"
 
     def test_parse_multi_char_operator_slash_slash(self, parser):
         """Test parsing with // operator."""
         expr = "(A//B)"
         tree = parser.parse(expr)
-        assert tree.root.value == "//"
-        assert tree.root.right.value == "A"
-        assert tree.root.left.value == "B"
+        assert tree.original_root.value == "//"
+        assert tree.original_root.left.value == "A"
+        assert tree.original_root.right.value == "B"
 
     def test_parse_example_from_docstring(self, parser):
         """Test parsing the example from parser docstring."""
         expr = "(2+(4*5))"
         tree = parser.parse(expr)
-        assert tree.root.value == "+"
-        assert tree.root.right.value == "2"
-        assert tree.root.left.value == "*"
-        assert tree.root.left.right.value == "4"
-        assert tree.root.left.left.value == "5"
+        assert tree.original_root.value == "+"
+        assert tree.original_root.left.value == "2"
+        assert tree.original_root.right.value == "*"
+        assert tree.original_root.right.left.value == "4"
+        assert tree.original_root.right.right.value == "5"
 
     def test_parse_complex_expression(self, parser):
         """Test parsing a complex expression with multiple operations."""
         expr = "((A+B)*(C-D))"
         tree = parser.parse(expr)
-        assert tree.root.value == "*"
-        assert tree.root.right.value == "+"
-        assert tree.root.right.right.value == "A"
-        assert tree.root.right.left.value == "B"
-        assert tree.root.left.value == "-"
-        assert tree.root.left.right.value == "C"
-        assert tree.root.left.left.value == "D"
+        assert tree.original_root.value == "*"
+        assert tree.original_root.left.value == "+"
+        assert tree.original_root.left.left.value == "A"
+        assert tree.original_root.left.right.value == "B"
+        assert tree.original_root.right.value == "-"
+        assert tree.original_root.right.left.value == "C"
+        assert tree.original_root.right.right.value == "D"
 
     def test_parse_single_variable(self, parser):
         """Test parsing a single variable (no operator)."""
         expr = "A"
         tree = parser.parse(expr)
         # Single variable should create a tree with just the variable
-        assert tree.root is not None
-        assert tree.root.value == "A"
-        assert tree.root.is_leaf()
+        assert tree.original_root is not None
+        assert tree.original_root.value == "A"
+        assert tree.original_root.is_leaf()
 
     def test_parse_single_number(self, parser):
         """Test parsing a single number."""
         expr = "100"
         tree = parser.parse(expr)
-        assert tree.root.value == "100"
-        assert tree.root.is_leaf()
+        assert tree.original_root.value == "100"
+        assert tree.original_root.is_leaf()
 
     def test_parse_very_complex_expression(self, parser):
         """Test parsing a very complex nested expression."""
         expr = "(Alpha+(Delta+(Pi*(Beta*(Gamma/Sigma)))))"
         tree = parser.parse(expr)
-        assert tree.root.value == "+"
-        assert tree.root.right.value == "Alpha"
-        assert tree.root.left.value == "+"
-        assert tree.root.left.right.value == "Delta"
-        assert tree.root.left.left.value == "*"
-        assert tree.root.left.left.right.value == "Pi"
-        assert tree.root.left.left.left.value == "*"
-        assert tree.root.left.left.left.right.value == "Beta"
-        assert tree.root.left.left.left.left.value == "/"
-        assert tree.root.left.left.left.left.right.value == "Gamma"
-        assert tree.root.left.left.left.left.left.value == "Sigma"
+        assert tree.original_root.value == "+"
+        assert tree.original_root.left.value == "Alpha"
+        assert tree.original_root.right.value == "+"
+        assert tree.original_root.right.left.value == "Delta"
+        assert tree.original_root.right.right.value == "*"
+        assert tree.original_root.right.right.left.value == "Pi"
+        assert tree.original_root.right.right.right.value == "*"
+        assert tree.original_root.right.right.right.left.value == "Beta"
+        assert tree.original_root.right.right.right.right.value == "/"
+        assert tree.original_root.right.right.right.right.left.value == "Gamma"
+        assert tree.original_root.right.right.right.right.right.value == "Sigma"
 
     def test_parse_tree_structure_integrity(self, parser):
         """Test that parse tree structure is correct."""
         expr = "(A+B)"
         tree = parser.parse(expr)
         # Root should be an operator
-        assert tree.root.is_operator()
+        assert tree.original_root.is_operator()
         # Left and right should be leaf nodes
-        assert tree.root.right.is_leaf()
-        assert tree.root.left.is_leaf()
+        assert tree.original_root.left.is_leaf()
+        assert tree.original_root.right.is_leaf()
         # Values should be correct
-        assert tree.root.right.value == "A"
-        assert tree.root.left.value == "B"
+        assert tree.original_root.left.value == "A"
+        assert tree.original_root.right.value == "B"
 
     def test_parse_multiple_operations_same_level(self, parser):
         """Test parsing multiple operations at the same level."""
         expr = "((A+B)+(C+D))"
         tree = parser.parse(expr)
-        assert tree.root.value == "+"
-        assert tree.root.right.value == "+"
-        assert tree.root.left.value == "+"
-        assert tree.root.right.right.value == "A"
-        assert tree.root.right.left.value == "B"
-        assert tree.root.left.right.value == "C"
-        assert tree.root.left.left.value == "D"
+        assert tree.original_root.value == "+"
+        assert tree.original_root.left.value == "+"
+        assert tree.original_root.right.value == "+"
+        assert tree.original_root.left.left.value == "A"
+        assert tree.original_root.left.right.value == "B"
+        assert tree.original_root.right.left.value == "C"
+        assert tree.original_root.right.right.value == "D"
 
     def test_parse_with_mixed_operators(self, parser):
         """Test parsing with mixed single and multi-character operators."""
         expr = "((A+B)*(C**D))"
         tree = parser.parse(expr)
-        assert tree.root.value == "*"
-        assert tree.root.right.value == "+"
-        assert tree.root.left.value == "**"
-        assert tree.root.left.right.value == "C"
-        assert tree.root.left.left.value == "D"
+        assert tree.original_root.value == "*"
+        assert tree.original_root.left.value == "+"
+        assert tree.original_root.right.value == "**"
+        assert tree.original_root.right.left.value == "C"
+        assert tree.original_root.right.right.value == "D"
 
     def test_parse_empty_string(self, parser):
         """Test parsing an empty string."""

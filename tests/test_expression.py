@@ -43,8 +43,8 @@ class TestDaskExpression:
         expr = DaskExpression("Alpha", "(A+B)")
         expr.build_tree()
         assert expr.parse_tree is not None
-        assert expr.parse_tree.root is not None
-        assert expr.parse_tree.root.value == "+"
+        assert expr.parse_tree.original_root is not None
+        assert expr.parse_tree.original_root.value == "+"
 
     def test_dask_expression_build_tree_custom_parser(self):
         """Test build_tree() with a custom parser."""
@@ -52,37 +52,37 @@ class TestDaskExpression:
         expr = DaskExpression("Alpha", "(A+B)")
         expr.build_tree(parser)
         assert expr.parse_tree is not None
-        assert expr.parse_tree.root.value == "+"
+        assert expr.parse_tree.original_root.value == "+"
 
     def test_dask_expression_build_tree_simple_expression(self):
         """Test build_tree() with a simple expression."""
         expr = DaskExpression("Alpha", "(5+3)")
         expr.build_tree()
-        assert expr.parse_tree.root.value == "+"
-        assert expr.parse_tree.root.right.value == "5"
-        assert expr.parse_tree.root.left.value == "3"
+        assert expr.parse_tree.original_root.value == "+"
+        assert expr.parse_tree.original_root.left.value == "5"
+        assert expr.parse_tree.original_root.right.value == "3"
 
     def test_dask_expression_build_tree_complex_expression(self):
         """Test build_tree() with a complex expression."""
         expr = DaskExpression("Beta", "(A+(B*C))")
         expr.build_tree()
-        assert expr.parse_tree.root.value == "+"
-        assert expr.parse_tree.root.right.value == "A"
-        assert expr.parse_tree.root.left.value == "*"
+        assert expr.parse_tree.original_root.value == "+"
+        assert expr.parse_tree.original_root.left.value == "A"
+        assert expr.parse_tree.original_root.right.value == "*"
 
     def test_dask_expression_build_tree_with_numbers(self):
         """Test build_tree() with numbers in expression."""
         expr = DaskExpression("Gamma", "(100+200)")
         expr.build_tree()
-        assert expr.parse_tree.root.value == "+"
-        assert expr.parse_tree.root.right.value == "100"
-        assert expr.parse_tree.root.left.value == "200"
+        assert expr.parse_tree.original_root.value == "+"
+        assert expr.parse_tree.original_root.left.value == "100"
+        assert expr.parse_tree.original_root.right.value == "200"
 
     def test_dask_expression_build_tree_with_multi_char_operators(self):
         """Test build_tree() with multi-character operators."""
         expr = DaskExpression("Delta", "(A++B)")
         expr.build_tree()
-        assert expr.parse_tree.root.value == "++"
+        assert expr.parse_tree.original_root.value == "++"
 
     def test_dask_expression_build_tree_multiple_times(self):
         """Test building tree multiple times (should overwrite)."""
@@ -95,7 +95,7 @@ class TestDaskExpression:
         second_tree = expr.parse_tree
         
         assert first_tree != second_tree
-        assert second_tree.root.value == "*"
+        assert second_tree.original_root.value == "*"
 
     def test_dask_expression_evaluate_not_implemented(self):
         """Test evaluate() method (currently not implemented)."""
@@ -119,7 +119,7 @@ class TestDaskExpression:
         expr = DaskExpression("Alpha", "(A+B)")
         # Note: build_tree() is called in __init__, so parse_tree is built automatically
         assert expr.parse_tree is not None
-        assert expr.parse_tree.root is not None
+        assert expr.parse_tree.original_root is not None
 
     def test_dask_expression_attributes_accessible(self):
         """Test that all attributes are accessible."""

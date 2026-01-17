@@ -16,15 +16,13 @@ class TestExpressionManager:
         manager = ExpressionManager()
         assert manager is not None
         assert manager.parser is not None
-        assert "Alpha" in manager.expressions
-        assert "Pi" in manager.expressions
-        assert "Mango" in manager.expressions
+        assert manager.expressions == {}
 
     def test_expression_manager_expressions_dict(self):
-        """Test that expressions is initialized with defaults."""
+        """Test that expressions is initialized as an empty dict."""
         manager = ExpressionManager()
         assert isinstance(manager.expressions, dict)
-        assert len(manager.expressions) >= 3
+        assert len(manager.expressions) == 0
 
     def test_expression_manager_has_parser(self):
         """Test that parser is initialized."""

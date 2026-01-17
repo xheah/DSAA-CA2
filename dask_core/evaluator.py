@@ -7,26 +7,33 @@ class Evaluator:
     def __init__(self):
         pass
 
+    def _normalize_number(self, value):
+        if isinstance(value, float) and value.is_integer():
+            return int(value)
+        return value
+
     def _sum_to(self, n: float) -> float:
         return n * (n + 1) / 2
     
     def _apply_operator(self, op, left_val, right_val):
         if left_val is None or right_val is None:
             return None
+        left_val = self._normalize_number(left_val)
+        right_val = self._normalize_number(right_val)
         if op == '+':
-            return left_val + right_val
+            return self._normalize_number(left_val + right_val)
         if op == '-':
-            return left_val - right_val
+            return self._normalize_number(left_val - right_val)
         if op == '*':
-            return left_val * right_val
+            return self._normalize_number(left_val * right_val)
         if op == '/':
-            return left_val / right_val
+            return self._normalize_number(left_val / right_val)
         if op == '++':
-            return self._sum_to(left_val) + self._sum_to(right_val)            
+            return self._normalize_number(self._sum_to(left_val) + self._sum_to(right_val))
         if op == '//':
-            return self._sum_to(left_val) / self._sum_to(right_val)
+            return self._normalize_number(self._sum_to(left_val) / self._sum_to(right_val))
         if op == '**':
-            return left_val**right_val
+            return self._normalize_number(left_val**right_val)
     
     def eval_node(self, node: TreeNode, context: dict) -> float | None:
         """
@@ -43,18 +50,22 @@ class Evaluator:
         number_re = re.compile(r'(\d+(\.\d*)?|\.\d+)$')
         if node.is_leaf():
             if isinstance(node.value, (int, float)):
-                return node.value
+                return self._normalize_number(node.value)
             if isinstance(node.value, str):
                 if number_re.fullmatch(node.value):
-                    return float(node.value)
+                    return self._normalize_number(float(node.value))
                 if context is None:
                     return None
                 if node.value not in context:
                     return None
                 expression = context[node.value]
-                if expression.parse_tree is None or expression.parse_tree.root is None:
+                if expression.parse_tree is None:
                     return None
-                return self.eval_node(expression.parse_tree.root, context)
+                parse_tree = expression.parse_tree
+                root = parse_tree.optimised_root if parse_tree.optimised_root is not None else parse_tree.original_root
+                if root is None:
+                    return None
+                return self.eval_node(root, context)
             return None
 
         return self._apply_operator(

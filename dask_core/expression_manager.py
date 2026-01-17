@@ -8,9 +8,9 @@ class ExpressionManager:
     def __init__(self):
         self.expressions: dict[str, DaskExpression] = {} # dict[str, DaskExpression]
         self.parser = ExpressionParser()
-        self.add_expression("Alpha", "(2+(4*5))")
-        self.add_expression("Pi", "(Alpha*3)")
-        self.add_expression("Mango", "((Alpha+(Delta+(Pi*(Beta*(Gamma/Sigma)))))/2)")
+        # self.add_expression("Alpha", "(2+(4*5))")
+        # self.add_expression("Pi", "(Alpha*3)")
+        # self.add_expression("Mango", "((Alpha+(Delta+(Pi*(Beta*(Gamma/Sigma)))))/2)")
 
     def add_expression(self, var_name: str, expression_str: str):
         """
@@ -25,10 +25,20 @@ class ExpressionManager:
         # expression = self.parser.parse(var_name, expression_str)
         self.expressions[var_name] = DaskExpression(var_name, expression_str)
 
-    def validate_expression(self, expression:str):
+    def validate_expression(self, expression:str) -> tuple:
+        """
+        Validate whether an expression fits all the conventions of a DASK Expression.
+        
+        :param self: EM
+        :param expression: Dask Expression
+        :type expression: str
+        
+        Returns:
+            tuple: error message, boolean of whether valid, var_name, var_expression
+        """
         valid_operators = {'+', '-', '*', '/', '**', '++', '//'}
         allowed_chars = set('0123456789+-*/()=.')
-
+        expression = expression.strip()
         if '=' not in expression:
             return "*Missing '=' sign in expression. Please re enter the expression*", False, '', ''
         
@@ -78,5 +88,9 @@ class ExpressionManager:
         pass
 
     def evaluate_all(self): # re-evaluate all the values for all dask expressions contained within EM
-        for var_name, expr in self.expressions.items():
+        for expr in self.expressions.values():
             expr.value = expr.evaluate(context=self.expressions)
+        
+    def optimise_all(self):
+        for expr in self.expressions.values():
+            expr.parse_tree.optimise()
