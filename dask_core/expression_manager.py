@@ -79,6 +79,9 @@ class ExpressionManager:
         if expr == '':
             return "*Expression cannot be empty. Please re enter the expression*", False, '', ''
         
+        if not any(op in expr for op in valid_operators):
+            return "*Enter a valid expression with an operator*", False, '', ''
+        
         if '(' not in expr or ')' not in expr:
             return "*Empty parentheses in expression. Please re enter the expression*", False, '', ''   
     

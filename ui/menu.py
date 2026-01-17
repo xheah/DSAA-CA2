@@ -1,6 +1,7 @@
 from dask_core.expression_manager import ExpressionManager
 from time import sleep
 from io_utils.file_handler import FileHandler
+from dask_core.expression import DaskExpression
 
 class Menu:
     def __init__(self):
@@ -52,7 +53,8 @@ class Menu:
                     self.read_from_file()
                     self._wait_for_continue()
                 case '5':
-                    print('filler5')
+                    self.sortexpressions()
+                    pass
                 case '6':
                     break
         print('\nBye, thanks for using ST1507 DSAA DASK Expression Evaluator')
@@ -129,3 +131,34 @@ class Menu:
         self.EM.evaluate_all()
         self.display_current()
         print('\n\n')
+
+    def sortexpressions(self):
+        counter = 0
+        output = ''
+        if len(self.EM.expressions) < 1:
+            print("There are currently no variables in this session.")
+            return
+        values = []
+        for expr in self.EM.expressions.values():
+            values.append(expr.value)
+        values = [v for v in values if v is not None]
+        values = set(values)
+        values = list(values)
+        values = sorted(values, reverse=True)
+        values.append(None)
+        
+        while True: 
+            output += f'*** Expressions with value=> {values[counter]}\n'
+
+            for expr in self.EM.expressions.values():
+                if expr.value == values[counter]:
+                    output += f'{expr.name}={expr.expression}\n'
+
+            counter += 1
+            output += '\n'
+            if counter == len(values):
+                break
+        file_handler = FileHandler()
+        file_handler.write_file(output)
+        print(f'\n>>> Sorting of DASK expressions completed!\n')
+

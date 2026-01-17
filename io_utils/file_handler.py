@@ -22,3 +22,19 @@ class FileHandler:
                 # Prefer deterministic behavior if multiple matches exist
                 matches.sort()
             return matches[0].read_text(encoding="utf-8")
+        
+    def write_file(self,content):
+        while True:
+            filename = input('\nPlease enter ouptut file: ').strip()
+            if not filename:
+                print('\nPlease enter a file name.')
+                continue
+            if not filename.endswith('.txt'):
+                print('\nPlease enter a valid .txt file')
+                continue
+            if any(char in filename for char in ['<', '>', ':', '"', '|', '?', '*']):
+                print("\nInvalid characters in filename.")
+                continue
+            file_path = self.project_root / 'data' /filename
+            file_path.write_text(content, encoding="utf-8")
+            return

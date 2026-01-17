@@ -1,0 +1,26 @@
+*** Expressions with value=> 240
+Delta=(Alpha*Pi)
+
+*** Expressions with value=> 135.5
+Lambda=(2*(65.5+2.25))
+Mu=((Alpha+(Delta+(Pi*(Beta*(Gamma/Sigma)))))/2)
+
+*** Expressions with value=> 16
+Sigma=(Pi*1)
+Beta=(Pi+0)
+Pi=(Alpha+1)
+Omicron=(2**4)
+
+*** Expressions with value=> 15
+Alpha=(3*5)
+
+*** Expressions with value=> 1
+Gamma=(1+0)
+
+*** Expressions with value=> 0.018461538461538463
+Zeta=(3//(4++5))
+
+*** Expressions with value=> None
+Xi=(Iota/2)
+Iota=(Pi+Theta)
+
