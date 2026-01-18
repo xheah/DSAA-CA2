@@ -1,9 +1,11 @@
 from dask_core.expression_manager import ExpressionManager
 from time import sleep
 from io_utils.file_handler import FileHandler
-from dask_core.expression import DaskExpression
+from dask_core.parse_tree import ParseTree
 from features.cost_analysis import CostAnalyser
 import re
+from features.differentiation import differentiate, UnsupportedOperatorError
+
 
 class Menu:
     def __init__(self):
@@ -64,7 +66,7 @@ class Menu:
                     self.optimise_cost()
                     self._wait_for_continue()
                 case '7':
-                    print("Symbolic Differentiation")
+                    self.differentiate_expression()
                     self._wait_for_continue()
                 case '8':
                     break
@@ -282,16 +284,29 @@ class Menu:
             if wrt not in self.EM.expressions:
                 print("Variable does not exist! Please try again.\n")
                 continue
-            break
 
-        count = expression.parse_tree.count_x_variable(wrt)
-        if count == 0:
-            print("0")
-            return
+            count = expression.parse_tree.count_x_variable(wrt)
+            if count == 0:
+                print("0")
+                return
 
-        # Differentiate
-        
-        # Optimise differentiated expression
+            # Differentiate
+            try:
+                root = expression.parse_tree.optimised_root
+                if root is None:
+                    root = expression.parse_tree.original_root
+                result: ParseTree | None = differentiate(root, wrt)
+                if result is None:
+                    print("Differentiation could not be completed for this expression.\n")
+                    return
+                break
+            except UnsupportedOperatorError:
+                print("Unsupported operator for differentiation. Please enter a different variable.\n")
+                continue
+            except ValueError:
+                print("A non-leaf in the ParseTree is not an operator. Please enter a different variable.\n")
+                continue
+        result.display_optimised_root()
 
         # Print results
         

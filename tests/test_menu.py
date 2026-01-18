@@ -4,10 +4,12 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from ui.menu import Menu
+from ui.menu import Menu, UnsupportedOperatorError
 import pytest
 from unittest.mock import patch
 from io import StringIO
+from dask_core.parse_tree import ParseTree
+from dask_core.tree_node import TreeNode
 
 
 @pytest.fixture
@@ -95,6 +97,38 @@ def test_menu_run_option_3(menu):
             output = fake_output.getvalue()
             assert "Expression Tree:" in output
             assert 'Value for variable "Alpha"' in output
+
+
+def test_menu_run_option_7_zero_when_no_occurrence(menu):
+    """Test option 7 prints 0 when wrt is not in the expression tree."""
+    inputs = [
+        '1', 'A=(1+2)', '',
+        '1', 'B=(3+4)', '',
+        '7', 'A', 'B', '',
+        '8',
+    ]
+    with patch('builtins.input', side_effect=inputs):
+        with patch('sys.stdout', new=StringIO()) as fake_output:
+            menu.run_menu()
+            output = fake_output.getvalue()
+            assert "0" in output
+
+
+def test_menu_run_option_7_unsupported_then_success(menu):
+    """Test option 7 handles unsupported operator then succeeds."""
+    inputs = [
+        '1', 'A=(B+1)', '',
+        '1', 'B=(2+3)', '',
+        '7', 'A', 'B', 'B', '',
+        '8',
+    ]
+    with patch('ui.menu.differentiate', side_effect=[UnsupportedOperatorError(), ParseTree(TreeNode("1"))]):
+        with patch('builtins.input', side_effect=inputs):
+            with patch('sys.stdout', new=StringIO()) as fake_output:
+                menu.run_menu()
+                output = fake_output.getvalue()
+                assert "Unsupported operator for differentiation" in output
+                assert "1" in output
 
 def test_menu_invalid_input_then_valid(menu):
     """Test that menu handles invalid input and prompts again."""
