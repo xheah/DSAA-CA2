@@ -54,6 +54,7 @@ class Menu:
                     self._wait_for_continue()
                 case '5':
                     self.sortexpressions()
+                    self._wait_for_continue()
                     pass
                 case '6':
                     break
