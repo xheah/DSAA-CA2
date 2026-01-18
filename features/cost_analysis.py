@@ -19,6 +19,24 @@ from dask_core.parse_tree import ParseTree
 class CostAnalyser:
     def __init__(self, tree: ParseTree = None):
         self.tree = tree
+        self.statistics = {}
+        
+        # Define metrics to compute for both original and optimised roots
+        metrics = [
+            ('total_nodes', 'count_nodes', 'all'),
+            ('operator_nodes', 'count_nodes', 'operator'),
+            ('leaf_nodes', 'count_nodes', 'leaf'),
+            ('tree_height', 'count_tree_height'),
+            ('weighted_op_cost', 'count_weighted_op_cost'),
+        ]
+        
+        # Compute metrics for both roots
+        for root_type in ['original', 'optimised']:
+            root = getattr(self.tree, f'{root_type}_root')
+            for suffix, method_name, *args in metrics:
+                key = f'{root_type}_{suffix}'
+                method = getattr(self, method_name)
+                self.statistics[key] = method(root, *args)
 
     def count_nodes(self, root: TreeNode, count_type: str = "all") -> int:
         """
@@ -59,22 +77,21 @@ class CostAnalyser:
         return 1 + max(left_height, right_height)
     
     def count_weighted_op_cost(self, root: TreeNode) -> int:
-        if root is None: return 0
+        if root is None:
+            return 0
         
         left_cost = self.count_weighted_op_cost(root.left) if root.left else 0
         right_cost = self.count_weighted_op_cost(root.right) if root.right else 0
 
         if root.is_operator():
             match root.value:
-                case ('+', '-'):
+                case '+' | '-':
                     return 1 + left_cost + right_cost
-                case ('*', '/'):
+                case '*' | '/':
                     return 2 + left_cost + right_cost
                 case '**':
                     return 3 + left_cost + right_cost
-                case ('++', '//'):
+                case '++' | '//':
                     return 3 + left_cost + right_cost
-                case _:
-                    return 0 + left_cost + right_cost  # Default for unknown operators
-        else:
             return left_cost + right_cost
+        return left_cost + right_cost

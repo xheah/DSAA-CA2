@@ -50,6 +50,8 @@ class ParseTree:
         if node is None:
             self.optimised_root = None
             return None
+        if is_root_call:
+            node = node.clone()
 
         if node.left is not None:
             node.left = self.optimise(node.left)
@@ -73,14 +75,13 @@ class ParseTree:
                     self.optimised_root = result
                 return result
 
-            # Identity rules
+            # Identity and zero rules
             identity_replacement = apply_identity_rules(node, left_is_num, right_is_num, to_number)
             if identity_replacement is not None:
                 if is_root_call:
                     self.optimised_root = identity_replacement
                 return identity_replacement
 
-            # Zero rules
             zero_replacement = apply_zero_rules(node, left_is_num, right_is_num, to_number)
             if zero_replacement is not None:
                 if is_root_call:

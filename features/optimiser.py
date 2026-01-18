@@ -33,6 +33,6 @@ def apply_zero_rules(node: TreeNode, left_is_num: bool, right_is_num: bool, to_n
             return TreeNode(0)
     if node.value == '/':
         if left_is_num and to_number(node.left.value) == 0:
-            if not right_is_num or to_number(node.right.value) != 0:
+            if right_is_num and to_number(node.right.value) != 0:
                 return TreeNode(0)
     return None

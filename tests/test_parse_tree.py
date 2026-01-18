@@ -165,6 +165,42 @@ class TestParseTree:
         assert tree.optimised_root is not None
         assert tree.optimised_root.value == 5.0
 
+    def test_parse_tree_optimise_constant_folding_summative_ops(self):
+        """Test optimise() folds ++ and // only for constant operands."""
+        root_sum = TreeNode("++", TreeNode("2"), TreeNode("3"))
+        tree_sum = ParseTree(root_sum)
+        optimised_sum = tree_sum.optimise()
+
+        assert optimised_sum is not None
+        assert tree_sum.optimised_root.value == 9
+
+        root_div = TreeNode("//", TreeNode("3"), TreeNode("2"))
+        tree_div = ParseTree(root_div)
+        optimised_div = tree_div.optimise()
+
+        assert optimised_div is not None
+        assert tree_div.optimised_root.value == 2
+
+    def test_parse_tree_optimise_constant_folding_summative_ops_with_variable(self):
+        """Test optimise() does not fold ++ or // when a variable is present."""
+        root_sum = TreeNode("++", TreeNode("A"), TreeNode("3"))
+        tree_sum = ParseTree(root_sum)
+        optimised_sum = tree_sum.optimise()
+
+        assert optimised_sum is not None
+        assert tree_sum.optimised_root.value == "++"
+        assert tree_sum.optimised_root.left.value == "A"
+        assert tree_sum.optimised_root.right.value == "3"
+
+        root_div = TreeNode("//", TreeNode("3"), TreeNode("A"))
+        tree_div = ParseTree(root_div)
+        optimised_div = tree_div.optimise()
+
+        assert optimised_div is not None
+        assert tree_div.optimised_root.value == "//"
+        assert tree_div.optimised_root.left.value == "3"
+        assert tree_div.optimised_root.right.value == "A"
+
     def test_parse_tree_optimise_identity_rule(self):
         """Test optimise() applies identity rules like x+0."""
         root = TreeNode("+", TreeNode("X"), TreeNode("0"))
@@ -174,6 +210,32 @@ class TestParseTree:
 
         assert optimised is not None
         assert tree.optimised_root.value == "X"
+
+    def test_parse_tree_optimise_identity_rule_left_zero(self):
+        """Test optimise() applies identity rule 0+x."""
+        root = TreeNode("+", TreeNode("0"), TreeNode("X"))
+        tree = ParseTree(root)
+
+        optimised = tree.optimise()
+
+        assert optimised is not None
+        assert tree.optimised_root.value == "X"
+
+    def test_parse_tree_optimise_identity_rule_mul_one(self):
+        """Test optimise() applies identity rules like x*1 and 1*x."""
+        root_right = TreeNode("*", TreeNode("X"), TreeNode("1"))
+        tree_right = ParseTree(root_right)
+        optimised_right = tree_right.optimise()
+
+        assert optimised_right is not None
+        assert tree_right.optimised_root.value == "X"
+
+        root_left = TreeNode("*", TreeNode("1"), TreeNode("X"))
+        tree_left = ParseTree(root_left)
+        optimised_left = tree_left.optimise()
+
+        assert optimised_left is not None
+        assert tree_left.optimised_root.value == "X"
 
     def test_parse_tree_optimise_identity_division_by_one(self):
         """Test optimise() applies identity rule x/1."""
@@ -211,6 +273,16 @@ class TestParseTree:
         assert optimised is not None
         assert tree.optimised_root.value == 0
 
+    def test_parse_tree_optimise_zero_rule_left_zero_mul(self):
+        """Test optimise() applies zero rule 0*x."""
+        root = TreeNode("*", TreeNode("0"), TreeNode("X"))
+        tree = ParseTree(root)
+
+        optimised = tree.optimise()
+
+        assert optimised is not None
+        assert tree.optimised_root.value == 0
+
     def test_parse_tree_optimise_zero_rule_division(self):
         """Test optimise() applies zero rule 0/x when x is nonzero constant."""
         root = TreeNode("/", TreeNode("0"), TreeNode("2"))
@@ -220,6 +292,18 @@ class TestParseTree:
 
         assert optimised is not None
         assert tree.optimised_root.value == 0
+
+    def test_parse_tree_optimise_zero_rule_division_variable(self):
+        """Test optimise() does not fold 0/x when x is a variable."""
+        root = TreeNode("/", TreeNode("0"), TreeNode("X"))
+        tree = ParseTree(root)
+
+        optimised = tree.optimise()
+
+        assert optimised is not None
+        assert tree.optimised_root.value == "/"
+        assert tree.optimised_root.left.value == "0"
+        assert tree.optimised_root.right.value == "X"
 
     def test_parse_tree_optimise_does_not_fold_variables(self):
         """Test optimise() does not fold variable-only operators."""
@@ -232,3 +316,15 @@ class TestParseTree:
         assert tree.optimised_root.value == "+"
         assert tree.optimised_root.left.value == "A"
         assert tree.optimised_root.right.value == "B"
+
+    def test_parse_tree_optimise_does_not_fold_variable_and_number(self):
+        """Test optimise() does not fold variable+number without identity/zero rules."""
+        root = TreeNode("+", TreeNode("A"), TreeNode("3"))
+        tree = ParseTree(root)
+
+        optimised = tree.optimise()
+
+        assert optimised is not None
+        assert tree.optimised_root.value == "+"
+        assert tree.optimised_root.left.value == "A"
+        assert tree.optimised_root.right.value == "3"
