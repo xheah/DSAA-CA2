@@ -3,6 +3,7 @@ from time import sleep
 from io_utils.file_handler import FileHandler
 from dask_core.expression import DaskExpression
 from features.cost_analysis import CostAnalyser
+import re
 
 class Menu:
     def __init__(self):
@@ -172,14 +173,23 @@ class Menu:
         file_handler.write_file(output)
         print(f'\n>>> Sorting of DASK expressions completed!\n')
 
-    def optimise_cost(self):
+    def request_expression(self) -> str:
+        """
+        Get the name of an expression from user
+        
+        :return: Name of variable
+        :rtype: str
+        """
         while True:
-            var_name = input("Please enter the expression you would like to optimise: ").strip()
+            var_name = input("Please enter an expression: ").strip()
             if var_name not in self.EM.expressions.keys():
                 print('Expression does not exist! Please try again.\n')     
                 sleep(0.5)
             else:
-                break
+                return var_name
+
+    def optimise_cost(self):
+        var_name = self.request_expression()
         self.EM.optimise_expression(var_name)
         print(f"Optimising {var_name}...\n")
         sleep(0.5)
@@ -260,3 +270,28 @@ class Menu:
         lines.append("=" * 60)
         lines.append("Legend: Visual bar shows % saved (more filled = more reduction)")
         print("\n".join(lines))
+
+    def differentiate_expression(self):
+        var_name = self.request_expression()
+        expression = self.EM.expressions[var_name]
+        while True:
+            wrt = input("Please enter the variable of differentation (w.r.t.): ").strip()
+            if not re.fullmatch(r"[a-zA-Z_]+", wrt):
+                print("Invalid variable name. Please try again.\n")
+                continue
+            if wrt not in self.EM.expressions:
+                print("Variable does not exist! Please try again.\n")
+                continue
+            break
+
+        count = expression.parse_tree.count_x_variable(wrt)
+        if count == 0:
+            print("0")
+            return
+
+        # Differentiate
+        
+        # Optimise differentiated expression
+
+        # Print results
+        

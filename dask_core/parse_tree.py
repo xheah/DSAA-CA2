@@ -102,3 +102,17 @@ class ParseTree:
         print(str('.'*level) + str(node.value))
         if node.right:
             self.display_optimised_root(node.right, level + 1)
+
+    def count_x_variable(self, x, node: TreeNode = None):
+        if node is None:
+            node = self.optimised_root if self.optimised_root is not None else self.original_root
+        if node is None:
+            return 0
+
+        count = 1 if node.is_variable() and node.value == x else 0
+        if node.left:
+            count += self.count_x_variable(x, node.left)
+        if node.right:
+            count += self.count_x_variable(x, node.right)
+
+        return count
