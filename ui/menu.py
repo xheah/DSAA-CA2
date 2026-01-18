@@ -2,6 +2,7 @@ from dask_core.expression_manager import ExpressionManager
 from time import sleep
 from io_utils.file_handler import FileHandler
 from dask_core.expression import DaskExpression
+from features.cost_analysis import CostAnalyser
 
 class Menu:
     def __init__(self):
@@ -182,7 +183,80 @@ class Menu:
         self.EM.optimise_expression(var_name)
         print(f"Optimising {var_name}...\n")
         sleep(0.5)
+        self.print_cost_analysis_report(var_name)
         
     
-    def print_cost_analysis_report(self, var_name: str):
-        pass 
+    def print_cost_analysis_report(self, var_name: str = None):
+        if var_name is None:
+            while True:
+                var_name = input("Please enter a variable to view its cost analysis:\n")
+                if var_name not in self.EM.expressions.keys():
+                    print("Variable does not exist! Please try again.\n")
+                    continue
+                break
+        var = self.EM.expressions[var_name]
+        cost_analyser = CostAnalyser(var.parse_tree)
+        statistics = cost_analyser.statistics
+
+        metrics = [
+            ("Total nodes", "total_nodes"),
+            ("Operator nodes", "operator_nodes"),
+            ("Leaf nodes", "leaf_nodes"),
+            ("Tree height", "tree_height"),
+            ("Weighted op cost", "weighted_op_cost"),
+        ]
+
+        def saved_percent(original, optimised):
+            if original == 0:
+                return 0.0
+            return (original - optimised) / original * 100
+
+        def bar(percent, width=20):
+            filled = int(round((percent / 100) * width))
+            filled = max(0, min(width, filled))
+            return "|" + ("#" * filled) + ("-" * (width - filled)) + "|"
+
+        lines = []
+        lines.append("=" * 60)
+        lines.append("  COST ANALYSIS REPORT  (Optimisation Impact)")
+        lines.append("-" * 60)
+        lines.append(f"  Variable   : {var_name}")
+        lines.append("  Status     : Optimised successfully")
+        lines.append("=" * 60)
+        lines.append("")
+        lines.append("METRICS (Original vs Optimised)")
+        lines.append("-" * 75)
+        lines.append("Metric                 Original   Optimised   Change        Saved%   Visual")
+        lines.append("-" * 75)
+
+        biggest_label = ""
+        biggest_saved = -1.0
+
+        for label, key in metrics:
+            original = statistics.get(f"original_{key}") or 0
+            optimised = statistics.get(f"optimised_{key}") or 0
+            change = optimised - original
+            saved = saved_percent(original, optimised)
+            if saved > biggest_saved:
+                biggest_saved = saved
+                biggest_label = label
+            lines.append(
+                f"{label:<22} {original:>9} {optimised:>11} {change:>9}   {saved:>6.1f}%   {bar(saved)}"
+            )
+
+        lines.append("-" * 75)
+        lines.append("")
+        lines.append("SUMMARY")
+        lines.append("-" * 60)
+        lines.append(f"* Biggest reduction : {biggest_label} ({biggest_saved:.1f}%)")
+        total_orig = statistics.get("original_total_nodes", 0)
+        total_opt = statistics.get("optimised_total_nodes", 0)
+        cost_orig = statistics.get("original_weighted_op_cost", 0)
+        cost_opt = statistics.get("optimised_weighted_op_cost", 0)
+        lines.append(
+            f"* Overall saving    : {saved_percent(total_orig, total_opt):.1f}% fewer nodes, "
+            f"{saved_percent(cost_orig, cost_opt):.1f}% less op-cost"
+        )
+        lines.append("=" * 60)
+        lines.append("Legend: Visual bar shows % saved (more filled = more reduction)")
+        print("\n".join(lines))

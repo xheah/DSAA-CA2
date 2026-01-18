@@ -30,3 +30,8 @@ class TreeNode:
             return self.value.isalpha()
         
         return False
+
+    def clone(self):
+        left_clone = self.left.clone() if self.left else None
+        right_clone = self.right.clone() if self.right else None
+        return TreeNode(self.value, left_clone, right_clone)
