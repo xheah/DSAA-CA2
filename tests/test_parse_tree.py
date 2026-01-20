@@ -328,3 +328,9 @@ class TestParseTree:
         assert tree.optimised_root.value == "+"
         assert tree.optimised_root.left.value == "A"
         assert tree.optimised_root.right.value == "3"
+
+    def test_parse_tree_to_expression(self):
+        """Test converting a parse tree back to an infix expression string."""
+        root = TreeNode("*", TreeNode("5"), TreeNode("6"))
+        tree = ParseTree(root)
+        assert tree.to_expression() == "(5*6)"

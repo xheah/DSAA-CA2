@@ -130,6 +130,22 @@ def test_menu_run_option_7_unsupported_then_success(menu):
                 assert "Unsupported operator for differentiation" in output
                 assert "1" in output
 
+
+def test_menu_run_option_7_stores_derivative(menu):
+    """Test option 7 stores the derivative with dX_dY naming."""
+    inputs = [
+        '1', 'Beta=(X+1)', '',
+        '1', 'X=(2+3)', '',
+        '7', 'Beta', 'X', '',
+        '8',
+    ]
+    with patch('builtins.input', side_effect=inputs):
+        with patch('sys.stdout', new=StringIO()) as fake_output:
+            menu.run_menu()
+            output = fake_output.getvalue()
+            assert "Stored derivative as dBeta_dX=" in output
+            assert "dBeta_dX" in menu.EM.expressions
+
 def test_menu_invalid_input_then_valid(menu):
     """Test that menu handles invalid input and prompts again."""
     # Provide invalid inputs followed by valid exit option

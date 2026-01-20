@@ -1,3 +1,4 @@
+import sys
 from dask_core.expression_manager import ExpressionManager
 from time import sleep
 from io_utils.file_handler import FileHandler
@@ -22,6 +23,7 @@ class Menu:
         self.option_display += "Enter choice: "
 
         self.EM = ExpressionManager()
+        self.animation_delay = 0.5
 
         self.title_screen = '''
 *********************************************************
@@ -257,6 +259,7 @@ class Menu:
             )
 
         lines.append("-" * 75)
+        # print trees here
         lines.append("")
         lines.append("SUMMARY")
         lines.append("-" * 60)
@@ -284,7 +287,7 @@ class Menu:
             if wrt not in self.EM.expressions:
                 print("Variable does not exist! Please try again.\n")
                 continue
-
+            wrt_expression = self.EM.expressions[wrt]
             count = expression.parse_tree.count_x_variable(wrt)
             if count == 0:
                 print("0")
@@ -306,7 +309,60 @@ class Menu:
             except ValueError:
                 print("A non-leaf in the ParseTree is not an operator. Please enter a different variable.\n")
                 continue
-        result.display_optimised_root()
+        self._loading_animation("Differentiating")
 
-        # Print results
+        # Store differentiated expression as a new variable
+        expr_str = result.to_expression("optimised")
+        if not expr_str:
+            print("Differentiation produced an empty expression.\n")
+            return
+        new_name = f"d{var_name}_d{wrt}"
+        self.EM.add_expression(new_name, expr_str)
+        self.EM.evaluate_all()
+
+
+        self._loading_animation("Optimising")
+        print('Success!')
+        sleep(0.5)
+        print()
+        # printing portion
+        line = "="*60
+        dash = '-'*60
+        print(line)
+        print("SYMBOLIC DIFFERENTIATION RESULTS")
+        print(dash)
+        print(f"Original Variable            : {var_name}")
+        print(f"Differentiated w.r.t.        : {wrt}")
+        print(f"Status                       : Completed & Optimised")
+        print(line)
+        print()
+
+        print("Original Expression (Parse Tree)")
+        print(dash)
+        expression.parse_tree.display_optimised_root()
+        print()
+        print(expression.expression)
+        print(dash)
+        print(f"Differentiated Variable: {new_name} (Parse Tree before Optimisation)")
+        print(dash)
+        result.printInOrder()
+        print()
+        print(result.to_expression('original'))
+        print(dash)
+        print(f"Differentiated Variable: {new_name} (Parse Tree after Optimisation)")
+        print(dash)
+        result.display_optimised_root()
+        print()
+        print(result.to_expression('optimised'))
+        print(line)
         
+    def _loading_animation(self, label: str):
+        frames = ["", ".", "..", "..."]
+        i = 0
+        while i < 9:
+            frame = frames[i % len(frames)]
+            sys.stdout.write(f'\r{label}' + frame + '   ')
+            sys.stdout.flush()
+
+            i += 1
+            sleep(self.animation_delay)

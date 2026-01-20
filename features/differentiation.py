@@ -118,4 +118,90 @@ def differentiate(node: TreeNode, wrt: str):
     if tree.optimised_root is None:
         tree.optimised_root = tree.original_root
     return tree
+
+
+def differentiate_with_trace(node: TreeNode, wrt: str):
+    """
+    Differentiate with a trace of intermediate optimised trees.
+    Returns (final_tree, trace_list).
+    """
+    trace = []
+
+    def snapshot(n: TreeNode):
+        tree = ParseTree(n)
+        tree.optimise()
+        if tree.optimised_root is None:
+            tree.optimised_root = tree.original_root
+        trace.append(tree)
+
+    def _diff(n: TreeNode):
+        if n is None:
+            return None
+        if n.is_leaf():
+            if n.is_number():
+                result = TreeNode(0)
+                snapshot(result)
+                return result
+            if n.is_variable():
+                result = TreeNode(1 if n.value == wrt else 0)
+                snapshot(result)
+                return result
+            return None
+        if not n.is_operator():
+            raise ValueError("Non-leaf is not an operator.")
+        if n.value in {"++", "//"}:
+            raise UnsupportedOperatorError("++ and // are not supported for differentation.")
+
+        op = n.value
+        left = n.left
+        right = n.right
+
+        if op == "+":
+            result = TreeNode("+", _diff(left), _diff(right))
+        elif op == "-":
+            result = TreeNode("-", _diff(left), _diff(right))
+        elif op == "*":
+            left_d = _diff(left)
+            right_d = _diff(right)
+            result = TreeNode(
+                "+",
+                TreeNode("*", left_d, right),
+                TreeNode("*", left, right_d),
+            )
+        elif op == "/":
+            left_d = _diff(left)
+            right_d = _diff(right)
+            numerator = TreeNode(
+                "-",
+                TreeNode("*", left_d, right),
+                TreeNode("*", left, right_d),
+            )
+            denominator = TreeNode("**", right, TreeNode(2))
+            result = TreeNode("/", numerator, denominator)
+        elif op == "**":
+            if _is_constant(right):
+                n_val = _constant_value(right)
+                left_d = _diff(left)
+                result = TreeNode(
+                    "*",
+                    TreeNode(n_val),
+                    TreeNode("*", TreeNode("**", left, TreeNode(n_val - 1)), left_d),
+                )
+            else:
+                raise UnsupportedOperatorError("Power rule only supports constant exponents.")
+        else:
+            return None
+
+        snapshot(result)
+        return result
+
+    final_root = _diff(node)
+    if final_root is None:
+        return None, trace
+
+    final_tree = ParseTree(final_root)
+    final_tree.optimise()
+    if final_tree.optimised_root is None:
+        final_tree.optimised_root = final_tree.original_root
+    return final_tree, trace
     

@@ -7,7 +7,7 @@ from features.optimiser import apply_identity_rules, apply_zero_rules
 class ParseTree:
     def __init__(self, root=None):
         self.original_root = root
-        self.optimised_root = None
+        self.optimised_root = self.optimise()
     
     def evaluate(self, evaluator = Evaluator(), context = None):
         root = self.optimised_root if self.optimised_root is not None else self.original_root
@@ -116,3 +116,29 @@ class ParseTree:
             count += self.count_x_variable(x, node.right)
 
         return count
+
+    def to_expression(self, root: str = "original") -> str:
+        """
+        Convert the parse tree back into its infix string format.
+
+        root:
+            - "original": original_root
+            - "optimised": optimised_root
+        """
+        if root not in ["original", "optimised"]:
+            raise ValueError("root must be original or optimised")
+
+        node = self.original_root if root == "original" else self.optimised_root
+        if node is None:
+            return ""
+
+        def _to_expr(n: TreeNode) -> str:
+            if n is None:
+                return ""
+            if n.is_leaf():
+                return str(n.value)
+            left = _to_expr(n.left)
+            right = _to_expr(n.right)
+            return f"({left}{n.value}{right})"
+
+        return _to_expr(node)
