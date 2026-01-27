@@ -25,11 +25,11 @@ class TestCostAnalyser:
         assert stats["original_tree_height"] == 3
         assert stats["original_weighted_op_cost"] == 3  # + (1) + * (2)
 
-        assert stats["optimised_total_nodes"] == 0
-        assert stats["optimised_operator_nodes"] == 0
-        assert stats["optimised_leaf_nodes"] == 0
-        assert stats["optimised_tree_height"] == 0
-        assert stats["optimised_weighted_op_cost"] == 0
+        assert stats["optimised_total_nodes"] == 5
+        assert stats["optimised_operator_nodes"] == 2
+        assert stats["optimised_leaf_nodes"] == 3
+        assert stats["optimised_tree_height"] == 3
+        assert stats["optimised_weighted_op_cost"] == 3
 
     def test_cost_analysis_optimised_root_counts(self):
         # Tree: (2 + 3) -> should fold to 5

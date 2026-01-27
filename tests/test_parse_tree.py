@@ -46,7 +46,7 @@ class TestParseTree:
         result = tree.evaluate(mock_evaluator, context)
         
         assert result == 5
-        mock_evaluator.eval_node.assert_called_once_with(root, context)
+        mock_evaluator.eval_node.assert_called_once_with(tree.optimised_root, context)
 
     def test_parse_tree_print_rotated_default(self):
         """Test print_rotated() with default node (uses root)."""
@@ -141,18 +141,12 @@ class TestParseTree:
         tree = ParseTree(root)
         
         mock_evaluator = Mock()
-        mock_evaluator.eval_node.side_effect = lambda node, ctx: {
-            root: 15,
-            root.left: 5,
-            root.right: 3,
-            TreeNode("A"): 2,
-            TreeNode("B"): 3,
-            TreeNode("C"): 3
-        }.get(node, 0)
+        mock_evaluator.eval_node.return_value = 15
         
         context = {}
         result = tree.evaluate(mock_evaluator, context)
         assert result == 15
+        mock_evaluator.eval_node.assert_called_once_with(tree.optimised_root, context)
 
     def test_parse_tree_optimise_constant_folding(self):
         """Test optimise() folds constant subtrees."""

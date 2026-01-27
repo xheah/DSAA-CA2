@@ -184,6 +184,9 @@ class Menu:
         :return: Name of variable
         :rtype: str
         """
+        if len(self.EM.expressions) < 1:
+            print("There are currently no variables in this session.")
+            return ""
         while True:
             var_name = input("Please enter an expression: ").strip()
             if var_name not in self.EM.expressions.keys():
@@ -194,6 +197,8 @@ class Menu:
 
     def optimise_cost(self):
         var_name = self.request_expression()
+        if not var_name:
+            return
         self.EM.optimise_expression(var_name)
         print(f"Optimising {var_name}...\n")
         sleep(0.5)
@@ -278,6 +283,8 @@ class Menu:
 
     def differentiate_expression(self):
         var_name = self.request_expression()
+        if not var_name:
+            return
         expression = self.EM.expressions[var_name]
         while True:
             wrt = input("Please enter the variable of differentation (w.r.t.): ").strip()
@@ -318,6 +325,7 @@ class Menu:
             return
         new_name = f"d{var_name}_d{wrt}"
         self.EM.add_expression(new_name, expr_str)
+        print(f"Stored derivative as {new_name}={expr_str}")
         self.EM.evaluate_all()
 
 
@@ -337,7 +345,7 @@ class Menu:
         print(line)
         print()
 
-        print("Original Expression (Parse Tree)")
+        print("Dependent Variable's Optimised Expression (Parse Tree)")
         print(dash)
         expression.parse_tree.display_optimised_root()
         print()
@@ -361,8 +369,11 @@ class Menu:
         i = 0
         while i < 9:
             frame = frames[i % len(frames)]
-            sys.stdout.write(f'\r{label}' + frame + '   ')
+            sys.stdout.write(f"\r\033[K{label}{frame}")
             sys.stdout.flush()
 
             i += 1
             sleep(self.animation_delay)
+        sys.stdout.write("\r\033[K")
+        sys.stdout.flush()
+        print()
