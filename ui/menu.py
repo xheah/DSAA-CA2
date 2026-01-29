@@ -86,6 +86,13 @@ class Menu:
                 expression = input(f'\n{message}: ')
                 message,result,name,expr = self.EM.validate_expression(expression)
             elif result == True:
+                try:
+                    # Parse once to catch constant division by zero before storing
+                    self.EM.parser.parse(expr)
+                except ZeroDivisionError:
+                    expression = input("\nDivision by zero detected. Please enter a new expression: ")
+                    message, result, name, expr = self.EM.validate_expression(expression)
+                    continue
                 self.EM.add_expression(name, expr)
                 break
 
@@ -133,6 +140,13 @@ class Menu:
                 print(validity)
                 print(name)
                 print(expr)
+                break
+            try:
+                # Parse once to catch constant division by zero before storing
+                self.EM.parser.parse(expr)
+            except ZeroDivisionError:
+                print(f"Division by zero detected in expression: {expression}")
+                validity = False
                 break
 
         if not validity:

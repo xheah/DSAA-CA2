@@ -27,8 +27,7 @@ class TreeNode:
     
     def is_variable(self):
         if isinstance(self.value, str):
-            return self.value.isalpha()
-        
+            return self.value.replace("_", "").isalpha()
         return False
 
     def clone(self):

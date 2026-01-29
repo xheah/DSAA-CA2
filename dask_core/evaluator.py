@@ -35,7 +35,7 @@ class Evaluator:
         if op == '**':
             return self._normalize_number(left_val**right_val)
     
-    def eval_node(self, node: TreeNode, context: dict) -> float | None:
+    def eval_node(self, node: TreeNode, context: dict, visited: set | None = None) -> float | None:
         """
         Docstring for eval_node
         
@@ -48,6 +48,8 @@ class Evaluator:
         :rtype: float | None
         """
         number_re = re.compile(r'(\d+(\.\d*)?|\.\d+)$')
+        if visited is None:
+            visited = set()
         if node.is_leaf():
             if isinstance(node.value, (int, float)):
                 return self._normalize_number(node.value)
@@ -58,6 +60,9 @@ class Evaluator:
                     return None
                 if node.value not in context:
                     return None
+                if node.value in visited:
+                    return None
+                visited.add(node.value)
                 expression = context[node.value]
                 if expression.parse_tree is None:
                     return None
@@ -65,12 +70,14 @@ class Evaluator:
                 root = parse_tree.optimised_root if parse_tree.optimised_root is not None else parse_tree.original_root
                 if root is None:
                     return None
-                return self.eval_node(root, context)
+                result = self.eval_node(root, context, visited)
+                visited.discard(node.value)
+                return result
             return None
 
         return self._apply_operator(
             node.value,
-            self.eval_node(node.left, context),
-            self.eval_node(node.right, context),
+            self.eval_node(node.left, context, visited),
+            self.eval_node(node.right, context, visited),
         )
 
