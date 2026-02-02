@@ -35,6 +35,11 @@ def test_validate_rejects_empty_expression():
     assert "Expression cannot be empty" in msg
 
 
+def test_tokenize_rejects_invalid_decimal_token():
+    with pytest.raises(ValueError):
+        tokenize("(1.+2)")
+
+
 def test_tokenize_supports_underscores_in_variables():
     tokens = tokenize("(a_b+1)")
     assert "a_b" in tokens
@@ -76,6 +81,7 @@ def test_file_handler_read_file_mock(monkeypatch):
     class FakePath:
         def __init__(self, text):
             self._text = text
+            self.name = "mock.txt"
 
         def read_text(self, encoding=None):
             return self._text

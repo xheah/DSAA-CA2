@@ -20,23 +20,53 @@ class CostAnalyser:
     def __init__(self, tree: ParseTree = None):
         self.tree = tree
         self.statistics = {}
-        
-        # Define metrics to compute for both original and optimised roots
-        metrics = [
-            ('total_nodes', 'count_nodes', 'all'),
-            ('operator_nodes', 'count_nodes', 'operator'),
-            ('leaf_nodes', 'count_nodes', 'leaf'),
-            ('tree_height', 'count_tree_height'),
-            ('weighted_op_cost', 'count_weighted_op_cost'),
-        ]
-        
-        # Compute metrics for both roots
+
+        # Compute metrics for both roots with a single traversal per root
         for root_type in ['original', 'optimised']:
             root = getattr(self.tree, f'{root_type}_root')
-            for suffix, method_name, *args in metrics:
+            metrics = self._collect_metrics(root)
+            for suffix, value in metrics.items():
                 key = f'{root_type}_{suffix}'
-                method = getattr(self, method_name)
-                self.statistics[key] = method(root, *args)
+                self.statistics[key] = value
+
+    def _collect_metrics(self, root: TreeNode) -> dict:
+        """
+        Single-pass traversal that collects all metrics.
+        """
+        def op_cost(node: TreeNode) -> int:
+            if not node or not node.is_operator():
+                return 0
+            match node.value:
+                case '+' | '-':
+                    return 1
+                case '*' | '/':
+                    return 2
+                case '**' | '++' | '//':
+                    return 3
+            return 0
+
+        def walk(node: TreeNode):
+            if node is None:
+                return 0, 0, 0, 0, 0
+
+            left_total, left_op, left_leaf, left_height, left_cost = walk(node.left)
+            right_total, right_op, right_leaf, right_height, right_cost = walk(node.right)
+
+            total = 1 + left_total + right_total
+            operator = (1 if node.is_operator() else 0) + left_op + right_op
+            leaf = (1 if node.is_leaf() else 0) + left_leaf + right_leaf
+            height = 1 + max(left_height, right_height)
+            cost = op_cost(node) + left_cost + right_cost
+            return total, operator, leaf, height, cost
+
+        total, operator, leaf, height, cost = walk(root)
+        return {
+            "total_nodes": total,
+            "operator_nodes": operator,
+            "leaf_nodes": leaf,
+            "tree_height": height,
+            "weighted_op_cost": cost,
+        }
 
     def count_nodes(self, root: TreeNode, count_type: str = "all") -> int:
         """

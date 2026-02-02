@@ -51,14 +51,16 @@ def tokenize(expr: str) -> list[str]:
             if len(num) == 0 and next_is_digit:
                 num = '0.'
             elif len(num) > 0 and '.' not in num:
+                if not next_is_digit:
+                    raise ValueError("Invalid number format.")
                 num += '.'
             else:
-                # Treat as a standalone token if it doesn't belong to a number
-                if len(num) > 0:
-                    tokens.append(num)
-                    num = ''
-                tokens.append(ch)
+                # Invalid decimal format
+                raise ValueError("Invalid number format.")
         else:
+            if ch.isspace():
+                i += 1
+                continue
             # When we hit a non-letter, non-digit, add any accumulated variable or number first
             if len(var) > 0:
                 tokens.append(var)

@@ -38,7 +38,9 @@ class ExpressionManager:
         """
         valid_operators = {'+', '-', '*', '/', '**', '++', '//'}
         allowed_chars = set('0123456789+-*/()=.')
-        expression = expression.strip()
+        if not isinstance(expression, str):
+            return "*Expression must be a string. Please re enter the expression*", False, '', ''
+        expression = re.sub(r"\s+", "", expression.strip())
         if '=' not in expression:
             return "*Missing '=' sign in expression. Please re enter the expression*", False, '', ''
         
@@ -84,6 +86,13 @@ class ExpressionManager:
         
         if '(' not in expr or ')' not in expr:
             return "*Empty parentheses in expression. Please re enter the expression*", False, '', ''   
+
+        try:
+            self.parser.parse(expr)
+        except ZeroDivisionError:
+            return "*Division by zero in expression. Please re enter the expression*", False, '', ''
+        except ValueError:
+            return "*Expression must be fully parenthesized and valid. Please re enter the expression*", False, '', ''
     
         return '', True, name, expr
         

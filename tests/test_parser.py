@@ -120,9 +120,9 @@ class TestLexer:
         assert result == expected
 
     def test_tokenize_whitespace_in_expression(self):
-        """Test tokenizing expression with whitespace (should be treated as non-letters)."""
+        """Test tokenizing expression with whitespace (should be ignored)."""
         expr = "Alpha + Beta"
-        expected = ["Alpha", " ", "+", " ", "Beta"]
+        expected = ["Alpha", "+", "Beta"]
         result = tokenize(expr)
         assert result == expected
 

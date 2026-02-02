@@ -162,31 +162,24 @@ class Menu:
         print('\n\n')
 
     def sortexpressions(self):
-        counter = 0
-        output = ''
         if len(self.EM.expressions) < 1:
             print("There are currently no variables in this session.")
             return
-        values = []
+        output = ''
+        grouped = {}
         for expr in self.EM.expressions.values():
-            values.append(expr.value)
-        values = [v for v in values if v is not None]
-        values = set(values)
-        values = list(values)
+            grouped.setdefault(expr.value, []).append(expr)
+
+        values = [v for v in grouped.keys() if v is not None]
         values = sorted(values, reverse=True)
-        values.append(None)
-        
-        while True: 
-            output += f'*** Expressions with value=> {values[counter]}\n'
+        if None in grouped:
+            values.append(None)
 
-            for expr in self.EM.expressions.values():
-                if expr.value == values[counter]:
-                    output += f'{expr.name}={expr.expression}\n'
-
-            counter += 1
+        for value in values:
+            output += f'*** Expressions with value=> {value}\n'
+            for expr in sorted(grouped[value], key=lambda e: e.name):
+                output += f'{expr.name}={expr.expression}\n'
             output += '\n'
-            if counter == len(values):
-                break
         file_handler = FileHandler()
         file_handler.write_file(output)
         print(f'\n>>> Sorting of DASK expressions completed!\n')
