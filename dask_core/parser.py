@@ -25,9 +25,16 @@ class ExpressionParser:
             if expr[i] == '(':
                 pass
             elif expr[i] == ')':
-                operator = operator_stack.pop()
-                rightnode = node_stack.pop()
-                leftnode = node_stack.pop()
+                try:
+                    operator = operator_stack.pop()
+                    rightnode = node_stack.pop()
+                    leftnode = node_stack.pop()
+                except IndexError as exc:
+                    raise ValueError("Invalid expression format.") from exc
+
+                if operator in {'/', '//'} and rightnode.is_leaf() and rightnode.is_number():
+                    if float(rightnode.value) == 0:
+                        raise ZeroDivisionError("Division by zero.")
             
                 subtree = TreeNode(operator, leftnode, rightnode)
                 node_stack.push(subtree)
@@ -36,5 +43,7 @@ class ExpressionParser:
             else:
                 node_stack.push(TreeNode(expr[i]))
             i += 1
+        if operator_stack.size() != 0 or node_stack.size() != 1:
+            raise ValueError("Invalid expression format.")
         return ParseTree(node_stack.pop())
             

@@ -70,10 +70,11 @@ class ParseTree:
             # Constant folding (only when both are numbers)
             if left_is_num and right_is_num:
                 folded = evaluator._apply_operator(node.value, to_number(left.value), to_number(right.value))
-                result = TreeNode(folded)
-                if is_root_call:
-                    self.optimised_root = result
-                return result
+                if folded is not None:
+                    result = TreeNode(folded)
+                    if is_root_call:
+                        self.optimised_root = result
+                    return result
 
             # Identity and zero rules
             identity_replacement = apply_identity_rules(node, left_is_num, right_is_num, to_number)

@@ -443,16 +443,11 @@ class TestParser:
 
     def test_parse_numbers_and_variables(self, parser):
         """Test parsing expressions with numbers and variables."""
-        # Note: The parser processes tokens sequentially
-        # For (Alpha100+Beta200), tokens are: ['(', 'Alpha', '100', '+', 'Beta', '200', ')']
-        # The parser creates nodes for Alpha, 100, Beta, 200, then when it sees ')',
-        # it pops the last two nodes (Beta, 200) and the operator (+)
+        # Variable names are letters/underscores only; digits must be separate tokens.
+        # "Alpha100" and "Beta200" are invalid variable names and should fail parsing.
         expr = "(Alpha100+Beta200)"
-        tree = parser.parse(expr)
-        assert tree.original_root.value == "+"
-        # The parser's behavior with adjacent tokens may not match expected structure
-        # This test verifies it at least creates a tree with the operator
-        assert tree.original_root.is_operator()
+        with pytest.raises(ValueError):
+            parser.parse(expr)
         # For a simpler case, test with separated tokens
         expr2 = "(Alpha+100)"
         tree2 = parser.parse(expr2)
@@ -576,6 +571,5 @@ class TestParser:
     def test_parse_empty_string(self, parser):
         """Test parsing an empty string."""
         expr = ""
-        # Empty string causes an error because node_stack is empty when trying to pop
-        with pytest.raises(IndexError):
+        with pytest.raises(ValueError):
             parser.parse(expr)

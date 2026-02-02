@@ -28,7 +28,7 @@ def tokenize(expr: str) -> list[str]:
     while i < len(expr):
         ch = expr[i]
         
-        if ch in ascii_letters:
+        if ch in ascii_letters or ch == '_':
             # Accumulate letters into a variable name
             # If we have accumulated a number, add it first
             if len(num) > 0:

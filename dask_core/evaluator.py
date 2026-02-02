@@ -26,6 +26,8 @@ class Evaluator:
             return self._normalize_number(left_val - right_val)
         if op == '*':
             return self._normalize_number(left_val * right_val)
+        if op in {'/', '//'} and right_val == 0:
+            return None
         if op == '/':
             return self._normalize_number(left_val / right_val)
         if op == '++':
