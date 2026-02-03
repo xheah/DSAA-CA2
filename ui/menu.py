@@ -7,6 +7,7 @@ from features.cost_analysis import CostAnalyser
 import re
 from features.differentiation import differentiate, UnsupportedOperatorError
 from dask_core.evaluator import Evaluator
+from dask_core.history import History
 
 
 class Menu:
@@ -400,54 +401,15 @@ class Menu:
     
     
     def loadhistory(self):
-        history = self.EM.gethistory()
-        if not history:
-            print('There are no existing expressions')
-
-        else:
-            sortedHistory = dict(sorted(history.items()))
-            print('')
-            print('EXPRESSION HISTORY')
-            print('**************************')
-            for i in sortedHistory:
-                print(f'VARIABLE ==> {i}')
-                for expr,version in sortedHistory[i].items():
-                    print(f'EXPRESSION: {expr} VERSION: {version}')
-                print('')
-            self.history = sortedHistory
-            self.promptrevert()
-
-    def promptrevert(self):
-        userInput=input("Do you wish to revert any changes?(y/n): ")
-        while userInput.upper() not in ['Y','N']:
-            userInput = input("\nPlease re enter a valid option(y/n): ")
-
-        if userInput.upper() == 'N':
-            print('\nHeading back to the menu.')
+        history = History(self.EM.history)
+        name, expr = history.printhistory(history.history)
+        if name == '' and expr == '':
             return
-        
-        variableName = input('Please enter the name of the variable: ')
-        while variableName not in self.history:
-            variableName = input('\nPlease re enter an existing variable: ')
+        else:
+            self.EM.add_expression(name,expr)
+            self.EM.evaluate_all()
+            return
 
-        version = input('Please enter version of expression you would like to revert to: ')
-        versionList = list(self.history[variableName].values())
-        while True:
-            try:
-                if version == '':
-                    version = input('Please enter a valid version')
-                if int(version) not in versionList:
-                    version = input('Please enter a valid version: ')
-                else:
-                    break
-            except:
-                version = input('Please enter an integer: ')
-        for expr, Hversion in self.history[variableName].items():
-            if Hversion == int(version):
-                expression = expr
-                break
-        self.EM.add_expression(variableName,expression)
-        self.EM.evaluate_all()
 
     def evaluatenoparanthesis(self):
         expression = input('Enter the DASK expression you wish to evaluate: \nFor example, a=1+2\n')
@@ -468,11 +430,7 @@ class Menu:
                     continue
                 evaluator = Evaluator()
                 result = tree.evaluate(evaluator, context=self.EM.expressions)
-                result = round(result,3)
-                print(f'"{expression}" ==> {result}\n')
+                if type(result) == int:
+                    result = round(result,3)
+                print(f'"{expression}" ==> {name}={result}\n')
                 break
-
-                
-
-    
-        
