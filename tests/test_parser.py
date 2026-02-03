@@ -517,6 +517,40 @@ class TestParser:
         assert tree.original_root.value == "100"
         assert tree.original_root.is_leaf()
 
+    def test_parse_single_value_with_parentheses_number(self, parser):
+        """Test parsing a single number wrapped in parentheses."""
+        expr = "(1)"
+        tree = parser.parse(expr)
+        assert tree.original_root.value == "1"
+        assert tree.original_root.is_leaf()
+
+    def test_parse_single_value_with_parentheses_decimal(self, parser):
+        """Test parsing a single decimal wrapped in parentheses."""
+        expr = "(1.1)"
+        tree = parser.parse(expr)
+        assert tree.original_root.value == "1.1"
+        assert tree.original_root.is_leaf()
+
+    def test_parse_single_value_with_parentheses_large_number(self, parser):
+        """Test parsing a large single number wrapped in parentheses."""
+        expr = "(999999)"
+        tree = parser.parse(expr)
+        assert tree.original_root.value == "999999"
+        assert tree.original_root.is_leaf()
+
+    def test_parse_single_value_with_parentheses_variable(self, parser):
+        """Test parsing a single variable wrapped in parentheses."""
+        expr = "(a)"
+        tree = parser.parse(expr)
+        assert tree.original_root.value == "a"
+        assert tree.original_root.is_leaf()
+
+    def test_parse_single_value_with_parentheses_negative_number_rejected(self, parser):
+        """Test parsing a negative single number wrapped in parentheses."""
+        expr = "(-1)"
+        with pytest.raises(ValueError):
+            parser.parse(expr)
+
     def test_parse_very_complex_expression(self, parser):
         """Test parsing a very complex nested expression."""
         expr = "(Alpha+(Delta+(Pi*(Beta*(Gamma/Sigma)))))"

@@ -26,14 +26,18 @@ class Evaluator:
             return self._normalize_number(left_val - right_val)
         if op == '*':
             return self._normalize_number(left_val * right_val)
-        if op in {'/', '//'} and right_val == 0:
+        if op == '/' and right_val == 0:
             return None
+        if op == '//':
+            divisor = self._sum_to(right_val)
+            if divisor == 0:
+                return None
         if op == '/':
             return self._normalize_number(left_val / right_val)
         if op == '++':
             return self._normalize_number(self._sum_to(left_val) + self._sum_to(right_val))
         if op == '//':
-            return self._normalize_number(self._sum_to(left_val) / self._sum_to(right_val))
+            return self._normalize_number(self._sum_to(left_val) / divisor)
         if op == '**':
             return self._normalize_number(left_val**right_val)
     

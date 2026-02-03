@@ -56,6 +56,52 @@ def test_menu_run_option_1(menu):
             assert "a" in menu.EM.expressions
 
 
+def test_menu_option_1_single_value_number(menu):
+    """Test option 1 accepts a single number in parentheses."""
+    inputs = ['1', 'a=(1)', '', '8']
+    with patch('builtins.input', side_effect=inputs):
+        with patch('sys.stdout', new=StringIO()):
+            menu.run_menu()
+            assert "a" in menu.EM.expressions
+
+
+def test_menu_option_1_single_value_decimal(menu):
+    """Test option 1 accepts a single decimal in parentheses."""
+    inputs = ['1', 'a=(1.1)', '', '8']
+    with patch('builtins.input', side_effect=inputs):
+        with patch('sys.stdout', new=StringIO()):
+            menu.run_menu()
+            assert "a" in menu.EM.expressions
+
+
+def test_menu_option_1_single_value_large_number(menu):
+    """Test option 1 accepts a large single number in parentheses."""
+    inputs = ['1', 'a=(999999)', '', '8']
+    with patch('builtins.input', side_effect=inputs):
+        with patch('sys.stdout', new=StringIO()):
+            menu.run_menu()
+            assert "a" in menu.EM.expressions
+
+
+def test_menu_option_1_single_value_variable(menu):
+    """Test option 1 accepts a single variable in parentheses."""
+    inputs = ['1', 'a=(b)', '', '8']
+    with patch('builtins.input', side_effect=inputs):
+        with patch('sys.stdout', new=StringIO()):
+            menu.run_menu()
+            assert "a" in menu.EM.expressions
+
+
+def test_menu_option_1_single_value_negative_rejected(menu):
+    """Test option 1 rejects a negative single number."""
+    inputs = ['1', 'a=(-1)', 'a=(1)', '', '8']
+    with patch('builtins.input', side_effect=inputs):
+        with patch('sys.stdout', new=StringIO()):
+            menu.run_menu()
+            assert "a" in menu.EM.expressions
+            assert menu.EM.expressions["a"].expression == "(1)"
+
+
 def test_menu_run_option_2(menu):
     """Test menu option 2 (Display current DASK expression)."""
     inputs = ['2', '', '8']
