@@ -39,23 +39,23 @@ class ExpressionManager:
         valid_operators = {'+', '-', '*', '/', '**', '++', '//'}
         allowed_chars = set('0123456789+-*/()=.')
         if not isinstance(expression, str):
-            return "*Expression must be a string. Please re enter the expression*", False, '', ''
+            return "Expression must be a string. Please re enter the expression", False, '', ''
         expression = re.sub(r"\s+", "", expression.strip())
         if '=' not in expression:
-            return "*Missing '=' sign in expression. Please re enter the expression*", False, '', ''
+            return "Missing '=' sign in expression. Please re enter the expression", False, '', ''
         
         if expression.count('=') > 1:
-            return "*Multiple '=' signs in expression. Please re enter the expression*", False, '', ''
+            return "Multiple '=' signs in expression. Please re enter the expression", False, '', ''
 
         if expression.count('(') != expression.count(')'):
-            return "*Mismatched parentheses in expression. Please re enter the expression*", False, '', ''
+            return "Mismatched parentheses in expression. Please re enter the expression", False, '', ''
         
         if re.search(r'\(\s*\)', expression):
-            return "*Empty parentheses in expression. Please re enter the expression*", False, '', ''
+            return "Empty parentheses in expression. Please re enter the expression", False, '', ''
             
         for char in expression:
             if char not in valid_operators and char not in allowed_chars and not char.isalpha():
-                return f"*Invalid character '{char}' in expression. Please re enter the expression*", False, '', ''
+                return f"Invalid character '{char}' in expression. Please re enter the expression", False, '', ''
             
 
         name, expr = expression.split('=', 1)
@@ -63,36 +63,36 @@ class ExpressionManager:
         expr = expr.strip()
 
         if not re.match(r'^[a-zA-Z_]+$', name):
-            return "*Invalid variable name. Please re enter the expression*", False, '', ''
+            return "Invalid variable name. Please re enter the expression", False, '', ''
         
         if re.search(r'[\+\-*/^][\s\)]*$', expr):
-            return "*Expression cannot end with an operator. Please re enter the expression*", False, '', ''
+            return "Expression cannot end with an operator. Please re enter the expression", False, '', ''
         
         if re.search(r'^[+\-*/^]\s*', expr):
-            return "*Expression cannot start with an operator. Please re enter the expression*", False, '', ''
+            return "Expression cannot start with an operator. Please re enter the expression", False, '', ''
 
         if re.search(r'(^|[=(*/+])\s*-\s*[\d\.]', expr):
-            return "*Negative numbers are not allowed. Please re enter the expression*", False, '', ''
+            return "Negative numbers are not allowed. Please re enter the expression", False, '', ''
 
         for number in re.findall(r'[\d\.]+', expr):
             if not re.fullmatch(r'(\d+(\.\d*)?|\.\d+)', number):
-                return "*Invalid number format. Please re enter the expression*", False, '', ''
+                return "Invalid number format. Please re enter the expression", False, '', ''
         
         if expr == '':
-            return "*Expression cannot be empty. Please re enter the expression*", False, '', ''
+            return "Expression cannot be empty. Please re enter the expression", False, '', ''
         
         # if not any(op in expr for op in valid_operators):
         #     return "*Enter a valid expression with an operator*", False, '', ''
         
         if '(' not in expr or ')' not in expr:
-            return "*Empty parentheses in expression. Please re enter the expression*", False, '', ''   
+            return "Empty parentheses in expression. Please re enter the expression", False, '', ''   
 
         try:
             self.parser.parse(expr)
         except ZeroDivisionError:
-            return "*Division by zero in expression. Please re enter the expression*", False, '', ''
+            return "Division by zero in expression. Please re enter the expression", False, '', ''
         except ValueError:
-            return "*Expression must be fully parenthesized and valid. Please re enter the expression*", False, '', ''
+            return "Expression must be fully parenthesized and valid. Please re enter the expression", False, '', ''
     
         return '', True, name, expr
         
