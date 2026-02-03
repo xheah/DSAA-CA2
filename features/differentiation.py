@@ -11,10 +11,27 @@ Derivatives are stored as a new variable
 """
 from dask_core.tree_node import TreeNode
 from dask_core.parse_tree import ParseTree
+from dask_core.tree_processor import TreeProcessor
 
 class UnsupportedOperatorError(Exception):
     """Exception raised for unsupported operators (++, //) in differentiation function"""
     pass
+
+
+class Differentiator(TreeProcessor):
+    def __init__(self, wrt: str):
+        self.wrt = wrt
+
+    def process(self, node: TreeNode, context=None):
+        result = _differentiate_node(node, self.wrt)
+        if result is None:
+            return None
+
+        tree = ParseTree(result)
+        tree.optimise()
+        if tree.optimised_root is None:
+            tree.optimised_root = tree.original_root
+        return tree
 
 def _is_constant(node: TreeNode) -> bool:
     return node is not None and node.is_leaf() and node.is_number()
@@ -109,15 +126,7 @@ def differentiate(node: TreeNode, wrt: str):
     Differentiate a parse tree rooted at node with respect to wrt.
     Returns an optimised ParseTree, or None if unsupported.
     """
-    result = _differentiate_node(node, wrt)
-    if result is None:
-        return None
-
-    tree = ParseTree(result)
-    tree.optimise()
-    if tree.optimised_root is None:
-        tree.optimised_root = tree.original_root
-    return tree
+    return Differentiator(wrt).process(node)
 
 
 def differentiate_with_trace(node: TreeNode, wrt: str):

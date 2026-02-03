@@ -3,6 +3,15 @@ Expression Optimisation Engine
 """
 
 from dask_core.tree_node import TreeNode
+from dask_core.tree_processor import TreeProcessor
+
+
+class Optimiser(TreeProcessor):
+    def __init__(self, parse_tree):
+        self.parse_tree = parse_tree
+
+    def process(self, node=None, context=None):
+        return self.parse_tree.optimise(node)
 
 
 def apply_identity_rules(node: TreeNode, left_is_num: bool, right_is_num: bool, to_number):

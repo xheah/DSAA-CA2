@@ -3,9 +3,13 @@ Handles evaluating trees, special ops (++ , //, **)
 """
 import re
 from dask_core.tree_node import TreeNode
-class Evaluator:
+from dask_core.tree_processor import TreeProcessor
+from dask_core.operators import build_operator_registry
+
+
+class Evaluator(TreeProcessor):
     def __init__(self):
-        pass
+        self._operators = build_operator_registry()
 
     def _normalize_number(self, value):
         if isinstance(value, float) and value.is_integer():
@@ -20,26 +24,11 @@ class Evaluator:
             return None
         left_val = self._normalize_number(left_val)
         right_val = self._normalize_number(right_val)
-        if op == '+':
-            return self._normalize_number(left_val + right_val)
-        if op == '-':
-            return self._normalize_number(left_val - right_val)
-        if op == '*':
-            return self._normalize_number(left_val * right_val)
-        if op == '/' and right_val == 0:
+        operator = self._operators.get(op)
+        if operator is None:
             return None
-        if op == '//':
-            divisor = self._sum_to(right_val)
-            if divisor == 0:
-                return None
-        if op == '/':
-            return self._normalize_number(left_val / right_val)
-        if op == '++':
-            return self._normalize_number(self._sum_to(left_val) + self._sum_to(right_val))
-        if op == '//':
-            return self._normalize_number(self._sum_to(left_val) / divisor)
-        if op == '**':
-            return self._normalize_number(left_val**right_val)
+        result = operator.apply(self, left_val, right_val)
+        return self._normalize_number(result) if result is not None else None
     
     def eval_node(self, node: TreeNode, context: dict, visited: set | None = None) -> float | None:
         """
@@ -87,3 +76,5 @@ class Evaluator:
             self.eval_node(node.right, context, visited),
         )
 
+    def process(self, node: TreeNode, context: dict | None = None):
+        return self.eval_node(node, context)
