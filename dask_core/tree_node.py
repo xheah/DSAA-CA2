@@ -3,9 +3,33 @@ TreeNode class (left, right, value/operator)
 """
 class TreeNode:
     def __init__(self, value=None, left=None, right=None):
-        self.value: str = value
-        self.left: TreeNode = left
-        self.right: TreeNode = right
+        self._value: str = value
+        self._left: TreeNode = left
+        self._right: TreeNode = right
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, new_value):
+        self._value = new_value
+
+    @property
+    def left(self):
+        return self._left
+
+    @left.setter
+    def left(self, new_left):
+        self._left = new_left
+
+    @property
+    def right(self):
+        return self._right
+
+    @right.setter
+    def right(self, new_right):
+        self._right = new_right
 
     def is_leaf(self):
         return self.left is None and self.right is None
