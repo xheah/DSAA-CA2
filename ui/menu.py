@@ -6,12 +6,14 @@ from dask_core.parse_tree import ParseTree
 from features.cost_analysis import CostAnalyser
 import re
 from features.differentiation import differentiate, UnsupportedOperatorError
+from dask_core.evaluator import Evaluator
+from features.history import History
 
 
 class Menu:
     def __init__(self):
         self.option_display = ""
-        self.option_display += "Please select your choice ('1', '2', '3', '4', '5', '6'):\n"
+        self.option_display += "Please select your choice ('1', '2', '3', '4', '5', '6', '7', '8', '9', '10'):\n"
         self.option_display += "\t1. Add/Modify DASK expression\n"
         self.option_display += "\t2. Display current DASK expression\n"
         self.option_display += "\t3. Evaluate a single DASK variable\n"
@@ -19,11 +21,14 @@ class Menu:
         self.option_display += "\t5. Sort DASK expressions\n"
         self.option_display += "\t6. Optimise Expressions and Cost Anaylsis (Aden)\n"
         self.option_display += "\t7. Symbolic Differentiation (Aden)\n"
-        self.option_display += "\t8. Exit\n"
+        self.option_display += "\t8. Expression History (Zuhao)\n"
+        self.option_display += "\t9. Evaluation without parantheses (Zuhao)\n"
+        self.option_display += "\t10. Exit\n"
         self.option_display += "Enter choice: "
 
         self.EM = ExpressionManager()
         self.animation_delay = 0.5
+        self.history = ''
 
         self.title_screen = '''
 *********************************************************
@@ -44,7 +49,7 @@ class Menu:
         print(self.title_screen)
         while True:
             user_choice = input(self.option_display).strip()
-            while user_choice not in ['1','2','3','4','5','6', '7', '8']:
+            while user_choice not in ['1','2','3','4','5','6','7','8','9','10']:
                 user_choice = input(f'\n*PLEASE ENTER A VALID NUMBER*\n{self.option_display}')
             
             match user_choice:
@@ -59,6 +64,7 @@ class Menu:
                     self._wait_for_continue()
                 case '4':
                     self.read_from_file()
+                    self.display_current()
                     self._wait_for_continue()
                 case '5':
                     self.sortexpressions()
@@ -71,11 +77,17 @@ class Menu:
                     self.differentiate_expression()
                     self._wait_for_continue()
                 case '8':
+                    self.loadhistory()
+                    self._wait_for_continue
+                case '9':
+                    self.evaluatenoparanthesis()
+                    self._wait_for_continue()
+                case '10':
                     break
         print('\nBye, thanks for using ST1507 DSAA DASK Expression Evaluator')
     
     def _wait_for_continue(self):
-        input("Press enter key, to continue....")
+        input("\nPress enter key, to continue....")
         self.EM.evaluate_all()
 
     def add_modify(self):
@@ -97,10 +109,11 @@ class Menu:
                 break
 
     def display_current(self):
-        print("CURRENT EXPRESSIONS:\n********************")
+        print("\nCURRENT EXPRESSIONS:\n********************")
         for name in sorted(self.EM.expressions.keys()):
             expression = self.EM.expressions[name]
             print(expression)
+        print('')
 
         sleep(0.5)
 
@@ -126,40 +139,43 @@ class Menu:
 
     def read_from_file(self):
         file_handler = FileHandler()
-
         file_contents = file_handler.read_file()
         file_expressions = file_contents.split('\n')
         
-        validity: bool = True
-        parsed_expressions = {}
+        validity = True
+        # Use a list to keep every version in order
+        parsed_expressions = [] 
+
         for expression in file_expressions:
-            (err_msg, validity, name, expr) = self.EM.validate_expression(expression)
-            parsed_expressions[name] = expr
-            if not validity:
+            if not expression.strip(): continue # Skip empty lines
+            
+            (err_msg, is_valid, name, expr) = self.EM.validate_expression(expression)
+            
+            if not is_valid:
                 print(err_msg)
-                print(validity)
-                print(name)
-                print(expr)
+                validity = False
                 break
+            
             try:
-                # Parse once to catch constant division by zero before storing
                 self.EM.parser.parse(expr)
+                # Store as a pair so we don't lose duplicates
+                parsed_expressions.append((name, expr)) 
             except ZeroDivisionError:
-                print(f"Division by zero detected in expression: {expression}")
+                print(f"Division by zero in: {expression}")
                 validity = False
                 break
 
         if not validity:
-            print('There is an invalid expression in the file provided.\nPlease try again later.')
-
+            print('Invalid expression in file. Aborting load.')
             return
 
-        for name, expr in parsed_expressions.items():
+        # Now add_expression will trigger the history logic for EVERY line
+        for name, expr in parsed_expressions:
             self.EM.add_expression(name, expr)
-        print('')
+
         self.EM.evaluate_all()
-        self.display_current()
-        print('\n\n')
+        # ... rest of your code
+
 
     def sortexpressions(self):
         if len(self.EM.expressions) < 1:
@@ -182,7 +198,7 @@ class Menu:
             output += '\n'
         file_handler = FileHandler()
         file_handler.write_file(output)
-        print(f'\n>>> Sorting of DASK expressions completed!\n')
+        print(f'\n>>> Sorting of DASK expressions completed!')
 
     def request_expression(self) -> str:
         """
@@ -384,3 +400,39 @@ class Menu:
         sys.stdout.write("\r\033[K")
         sys.stdout.flush()
         print()
+    
+    
+    def loadhistory(self):
+        history = History(self.EM.history)
+        name, expr = history.printhistory(history.history)
+        if name == '' and expr == '':
+            return
+        else:
+            self.EM.add_expression(name,expr)
+            self.EM.evaluate_all()
+            return
+
+
+    def evaluatenoparanthesis(self):
+        expression = input('Enter the DASK expression you wish to evaluate: \nFor example, a=1+2\n')
+        message, result,name,expr = self.EM.validation(expression)
+        while True:
+            if result == False:
+                expression = input(f'\n{message}: ')
+                message,result,name,expr = self.EM.validation(expression)
+            elif result == True:
+                try:
+                    tree = self.EM.parser.parses(expr)
+                    if type(tree) == int:
+                        print(f'"{expression} ==> {expr}')
+                    print()
+                except ZeroDivisionError:
+                    expression = input("\nDivision by zero detected. Please enter a new expression: ")
+                    message, result, name, expr = self.EM.validation(expression)
+                    continue
+                evaluator = Evaluator()
+                result = tree.evaluate(evaluator, context=self.EM.expressions)
+                if type(result) == int:
+                    result = round(result,3)
+                print(f'"{expression}" ==> {name}={result}\n')
+                break

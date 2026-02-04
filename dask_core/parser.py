@@ -11,6 +11,15 @@ class ExpressionParser:
     ExpressionParser to turn a string (2+(4*5)) into a ParseTree
     """
     def __init__(self):
+        self.precedence = {
+        '+': 1, 
+        '-': 1,
+        '*': 2, 
+        '/': 2,
+        '++': 3,
+        '//': 3, 
+        '**': 4
+    }
         self.operators = ['+', '-', '*', '/', '++', '**', '//']
     
     def parse(self, expr: str = None) -> ParseTree:
@@ -84,3 +93,31 @@ class ExpressionParser:
             raise ValueError("Invalid expression format.")
         return ParseTree(node_stack.pop())
             
+    def parses(self, expr: str = None) -> ParseTree:
+        if expr is None: return None
+        tokens = tokenize(expr)
+        operator_stack = Stack()
+        node_stack = Stack()
+        def build_subtree():
+            operator = operator_stack.pop()
+            right = node_stack.pop()
+            left = node_stack.pop()
+            node_stack.push(TreeNode(operator, left, right))
+        for token in tokens:
+            if token == '(':
+                operator_stack.push(token)
+            elif token == ')':
+                while not operator_stack.is_empty() and operator_stack.peek() != '(':
+                    build_subtree()
+                operator_stack.pop()
+            elif token in self.operators:
+                while (not operator_stack.is_empty() and
+                       operator_stack.peek() != '(' and
+                       self.precedence[operator_stack.peek()] >= self.precedence[token]):
+                    build_subtree()
+                operator_stack.push(token)
+            else:
+                node_stack.push(TreeNode(token))
+        while not operator_stack.is_empty():
+            build_subtree()
+        return ParseTree(node_stack.pop())

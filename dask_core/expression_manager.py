@@ -8,6 +8,7 @@ class ExpressionManager:
     def __init__(self):
         self.expressions: dict[str, DaskExpression] = {} # dict[str, DaskExpression]
         self.parser = ExpressionParser()
+        self.history = {}
         # self.add_expression("Alpha", "(2+(4*5))")
         # self.add_expression("Pi", "(Alpha*3)")
         # self.add_expression("Mango", "((Alpha+(Delta+(Pi*(Beta*(Gamma/Sigma)))))/2)")
@@ -23,6 +24,17 @@ class ExpressionManager:
         :type expression_str: str
         """
         # expression = self.parser.parse(var_name, expression_str)
+        if var_name not in self.history:
+            self.history[var_name] = {}
+        # 2. Check if this specific expression string is new for this variable
+        if expression_str not in self.history[var_name]:
+            # Assign a version number (1 for first expr, 2 for second, etc.)
+            version = len(self.history[var_name]) + 1
+            self.history[var_name][expression_str] = version
+
+        # 3. Create the expression object and store it in active expressions
+        self.expressions[var_name] = DaskExpression(var_name, expression_str)
+
         self.expressions[var_name] = DaskExpression(var_name, expression_str)
 
     def validate_expression(self, expression:str) -> tuple:
@@ -109,3 +121,54 @@ class ExpressionManager:
 
     def optimise_expression(self, var_name: str):
         self.expressions[var_name].parse_tree.optimise()
+
+    def gethistory(self):
+        return self.history
+    
+    def validation(self,expression: str):
+
+        valid_operators = {'+', '-', '*', '/', '**', '++', '//'}
+        allowed_chars = set('0123456789+-*/=.')
+
+        if not isinstance(expression, str):
+            return "Expression must be a string. Please re enter the expression", False, '', ''
+        expression = re.sub(r"\s+", "", expression.strip())
+
+        if '=' not in expression:
+            return "Missing '=' sign in expression. Please re enter the expression", False, '', ''
+        
+        if expression.count('=') > 1:
+            return "Multiple '=' signs in expression. Please re enter the expression", False, '', ''
+
+        if re.search(r'\(\s*\)', expression):
+            return "Empty parentheses in expression. Please re enter the expression", False, '', ''
+            
+        for char in expression:
+            if char not in valid_operators and char not in allowed_chars and not char.isalpha():
+                return f"Invalid character '{char}' in expression. Please re enter the expression", False, '', ''
+            
+
+        name, expr = expression.split('=', 1)
+        name = name.strip()
+        expr = expr.strip()
+
+        if not re.match(r'^[a-zA-Z_]+$', name):
+            return "Invalid variable name. Please re enter the expression", False, '', ''
+        
+        if re.search(r'[\+\-*/^][\s\)]*$', expr):
+            return "Expression cannot end with an operator. Please re enter the expression", False, '', ''
+        
+        if re.search(r'^[+\-*/^]\s*', expr):
+            return "Expression cannot start with an operator. Please re enter the expression", False, '', ''
+
+        if re.search(r'(^|[=(*/+])\s*-\s*[\d\.]', expr):
+            return "Negative numbers are not allowed. Please re enter the expression", False, '', ''
+
+        for number in re.findall(r'[\d\.]+', expr):
+            if not re.fullmatch(r'(\d+(\.\d*)?|\.\d+)', number):
+                return "Invalid number format. Please re enter the expression", False, '', ''
+        
+        if expr == '':
+            return "Expression cannot be empty. Please re enter the expression", False, '', ''  
+    
+        return '', True, name, expr
