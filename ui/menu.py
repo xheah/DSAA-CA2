@@ -152,7 +152,6 @@ class Menu:
             (err_msg, is_valid, name, expr) = self.EM.validate_expression(expression)
             
             if not is_valid:
-                print(err_msg)
                 validity = False
                 break
             
@@ -173,7 +172,8 @@ class Menu:
             self.EM.add_expression(name, expr)
 
         self.EM.evaluate_all()
-        # ... rest of your code
+        self.display_current()
+        print('\n\n')
 
 
     def sortexpressions(self):
