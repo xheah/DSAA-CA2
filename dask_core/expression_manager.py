@@ -73,7 +73,7 @@ class ExpressionManager:
         name = name.strip()
         expr = expr.strip()
 
-        if not re.match(r'^[a-zA-Z_]+$', name):
+        if not re.match(r'^[a-zA-Z]+$', name):
             return "Invalid variable name. Please re enter the expression", False, '', ''
         
         if re.search(r'[\+\-*/^][\s\)]*$', expr):
@@ -154,7 +154,7 @@ class ExpressionManager:
         name = name.strip()
         expr = expr.strip()
 
-        if not re.match(r'^[a-zA-Z_]+$', name):
+        if not re.match(r'^[a-zA-Z]+$', name):
             return "Invalid variable name. Please re enter the expression", False, '', ''
         
         if re.search(r'[\+\-*/^][\s\)]*$', expr):

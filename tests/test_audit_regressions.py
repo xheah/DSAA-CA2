@@ -40,10 +40,9 @@ def test_tokenize_rejects_invalid_decimal_token():
         tokenize("(1.+2)")
 
 
-def test_tokenize_supports_underscores_in_variables():
-    tokens = tokenize("(a_b+1)")
-    assert "a_b" in tokens
-    assert "_" not in tokens
+def test_tokenize_rejects_underscores_in_variables():
+    with pytest.raises(ValueError):
+        tokenize("(a_b+1)")
 
 
 def test_parser_rejects_non_fully_parenthesized_expression():
@@ -58,11 +57,11 @@ def test_evaluator_div_by_zero_returns_none():
     assert evaluator.eval_node(node, context={}) is None
 
 
-def test_underscore_variable_name_roundtrip():
+def test_underscore_variable_name_rejected():
     em = ExpressionManager()
-    em.add_expression("a_b", "(1+2)")
-    em.evaluate_all()
-    assert em.expressions["a_b"].value == 3
+    msg, ok, _, _ = em.validate_expression("a_b=(1+2)")
+    assert ok is False
+    assert "Invalid character" in msg
 
 
 def test_stress_deeply_nested_parse():

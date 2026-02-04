@@ -28,13 +28,15 @@ def tokenize(expr: str) -> list[str]:
     while i < len(expr):
         ch = expr[i]
         
-        if ch in ascii_letters or ch == '_':
+        if ch in ascii_letters:
             # Accumulate letters into a variable name
             # If we have accumulated a number, add it first
             if len(num) > 0:
                 tokens.append(num)
                 num = ''
             var += ch
+        elif ch == '_':
+            raise ValueError("Invalid character in expression.")
         elif ch in digits:
             # Accumulate digits into a number
             # If we have accumulated a variable, add it first

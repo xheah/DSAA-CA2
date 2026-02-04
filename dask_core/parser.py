@@ -44,7 +44,7 @@ class ExpressionParser:
 
         def is_single_value(s: str) -> bool:
             s = s.strip()
-            if re.fullmatch(r"[a-zA-Z_]+", s):
+            if re.fullmatch(r"[a-zA-Z]+", s):
                 return True
             if re.fullmatch(r"(\d+(\.\d*)?|\.\d+)", s):
                 return True

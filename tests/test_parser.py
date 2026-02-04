@@ -443,7 +443,7 @@ class TestParser:
 
     def test_parse_numbers_and_variables(self, parser):
         """Test parsing expressions with numbers and variables."""
-        # Variable names are letters/underscores only; digits must be separate tokens.
+        # Variable names are letters only; digits must be separate tokens.
         # "Alpha100" and "Beta200" are invalid variable names and should fail parsing.
         expr = "(Alpha100+Beta200)"
         with pytest.raises(ValueError):

@@ -29,13 +29,13 @@ def test_menu_init(menu):
     assert "5. Sort DASK expressions" in menu.option_display
     assert "6. Optimise Expressions and Cost Anaylsis" in menu.option_display
     assert "7. Symbolic Differentiation" in menu.option_display
-    assert "8. Exit" in menu.option_display
+    assert "10. Exit" in menu.option_display
     assert "Enter choice:" in menu.option_display
 
 
 def test_menu_run_exit_option(menu):
-    """Test that menu exits when option 6 is selected."""
-    with patch('builtins.input', return_value='8'):
+    """Test that menu exits when option 10 is selected."""
+    with patch('builtins.input', return_value='10'):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
             output = fake_output.getvalue()
@@ -47,7 +47,7 @@ def test_menu_run_option_1(menu):
     """Test menu option 1 (Add/Modify DASK expression)."""
     # Option 1 requires valid expression input like "a=(1+2)"
     # It has a validation loop, so we need to provide valid input
-    inputs = ['1', 'a=(1+2)', '', '8']
+    inputs = ['1', 'a=(1+2)', '', '10']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
@@ -58,7 +58,7 @@ def test_menu_run_option_1(menu):
 
 def test_menu_option_1_single_value_number(menu):
     """Test option 1 accepts a single number in parentheses."""
-    inputs = ['1', 'a=(1)', '', '8']
+    inputs = ['1', 'a=(1)', '', '10']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()):
             menu.run_menu()
@@ -67,7 +67,7 @@ def test_menu_option_1_single_value_number(menu):
 
 def test_menu_option_1_single_value_decimal(menu):
     """Test option 1 accepts a single decimal in parentheses."""
-    inputs = ['1', 'a=(1.1)', '', '8']
+    inputs = ['1', 'a=(1.1)', '', '10']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()):
             menu.run_menu()
@@ -76,7 +76,7 @@ def test_menu_option_1_single_value_decimal(menu):
 
 def test_menu_option_1_single_value_large_number(menu):
     """Test option 1 accepts a large single number in parentheses."""
-    inputs = ['1', 'a=(999999)', '', '8']
+    inputs = ['1', 'a=(999999)', '', '10']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()):
             menu.run_menu()
@@ -85,7 +85,7 @@ def test_menu_option_1_single_value_large_number(menu):
 
 def test_menu_option_1_single_value_variable(menu):
     """Test option 1 accepts a single variable in parentheses."""
-    inputs = ['1', 'a=(b)', '', '8']
+    inputs = ['1', 'a=(b)', '', '10']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()):
             menu.run_menu()
@@ -94,7 +94,7 @@ def test_menu_option_1_single_value_variable(menu):
 
 def test_menu_option_1_single_value_negative_rejected(menu):
     """Test option 1 rejects a negative single number."""
-    inputs = ['1', 'a=(-1)', 'a=(1)', '', '8']
+    inputs = ['1', 'a=(-1)', 'a=(1)', '', '10']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()):
             menu.run_menu()
@@ -104,7 +104,7 @@ def test_menu_option_1_single_value_negative_rejected(menu):
 
 def test_menu_run_option_2(menu):
     """Test menu option 2 (Display current DASK expression)."""
-    inputs = ['2', '', '8']
+    inputs = ['2', '', '10']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
@@ -120,7 +120,7 @@ def test_menu_option_2_sorts_expressions(menu):
         '1', 'b=(1+2)', '',
         '1', 'a=(3+4)', '',
         '2', '',
-        '8',
+        '10',
     ]
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
@@ -136,7 +136,7 @@ def test_menu_option_2_sorts_expressions(menu):
 
 def test_menu_run_option_3(menu):
     """Test menu option 3 (Evaluate a single DASK variable)."""
-    inputs = ['1', 'Alpha=(3+5)', '', '3', 'Alpha', '', '8']
+    inputs = ['1', 'Alpha=(3+5)', '', '3', 'Alpha', '', '10']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
@@ -151,7 +151,7 @@ def test_menu_run_option_7_zero_when_no_occurrence(menu):
         '1', 'A=(1+2)', '',
         '1', 'B=(3+4)', '',
         '7', 'A', 'B', '',
-        '8',
+        '10',
     ]
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
@@ -166,7 +166,7 @@ def test_menu_run_option_7_unsupported_then_success(menu):
         '1', 'A=(B+1)', '',
         '1', 'B=(2+3)', '',
         '7', 'A', 'B', 'B', '',
-        '8',
+        '10',
     ]
     with patch('ui.menu.differentiate', side_effect=[UnsupportedOperatorError(), ParseTree(TreeNode("1"))]):
         with patch('builtins.input', side_effect=inputs):
@@ -178,24 +178,25 @@ def test_menu_run_option_7_unsupported_then_success(menu):
 
 
 def test_menu_run_option_7_stores_derivative(menu):
-    """Test option 7 stores the derivative with dX_dY naming."""
+    """Test option 7 stores the derivative with dXdY naming."""
     inputs = [
         '1', 'Beta=(X+1)', '',
         '1', 'X=(2+3)', '',
         '7', 'Beta', 'X', '',
-        '8',
+        '10',
     ]
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
             output = fake_output.getvalue()
-            assert "Stored derivative as dBeta_dX=" in output
-            assert "dBeta_dX" in menu.EM.expressions
+            assert "Stored derivative as dBetadX=" in output
+            assert "dBetadX" in menu.EM.expressions
 
 def test_menu_invalid_input_then_valid(menu):
     """Test that menu handles invalid input and prompts again."""
     # Provide invalid inputs followed by valid exit option
-    inputs = ['invalid', '9', 'abc', '8']
+    # Note: '9' triggers option 9 which needs valid expression input, so we'll skip it
+    inputs = ['invalid', '10']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
@@ -209,7 +210,7 @@ def test_menu_invalid_input_then_valid(menu):
 def test_menu_multiple_options_before_exit(menu):
     """Test that menu can handle multiple options before exiting."""
     # Option 1 needs valid expression, option 2 shows header, option 3 evaluates Alpha
-    inputs = ['1', 'a=(1+2)', '', '2', '', '3', 'a', '', '8']
+    inputs = ['1', 'a=(1+2)', '', '2', '', '3', 'a', '', '10']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()
@@ -224,7 +225,7 @@ def test_menu_multiple_options_before_exit(menu):
 def test_menu_whitespace_handling(menu):
     """Test that menu handles whitespace in input."""
     # Option 1 with whitespace, then needs valid expression, then exit
-    inputs = ['  1  ', 'a=(1+2)', '', '  8  ']
+    inputs = ['  1  ', 'a=(1+2)', '', '  10  ']
     with patch('builtins.input', side_effect=inputs):
         with patch('sys.stdout', new=StringIO()) as fake_output:
             menu.run_menu()

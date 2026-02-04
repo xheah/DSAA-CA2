@@ -310,7 +310,7 @@ class Menu:
         expression = self.EM.expressions[var_name]
         while True:
             wrt = input("Please enter the variable of differentation (w.r.t.): ").strip()
-            if not re.fullmatch(r"[a-zA-Z_]+", wrt):
+            if not re.fullmatch(r"[a-zA-Z]+", wrt):
                 print("Invalid variable name. Please try again.\n")
                 continue
             if wrt not in self.EM.expressions:
@@ -345,7 +345,7 @@ class Menu:
         if not expr_str:
             print("Differentiation produced an empty expression.\n")
             return
-        new_name = f"d{var_name}_d{wrt}"
+        new_name = f"d{var_name}d{wrt}"
         self.EM.add_expression(new_name, expr_str)
         print(f"Stored derivative as {new_name}={expr_str}")
         self.EM.evaluate_all()
