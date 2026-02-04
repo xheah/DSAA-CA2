@@ -19,7 +19,7 @@ class ExpressionParser:
         '++': 3,
         '//': 3, 
         '**': 4
-    }
+        }
         self.operators = ['+', '-', '*', '/', '++', '**', '//']
     
     def parse(self, expr: str = None) -> ParseTree:
@@ -93,7 +93,10 @@ class ExpressionParser:
             raise ValueError("Invalid expression format.")
         return ParseTree(node_stack.pop())
             
-    def parses(self, expr: str = None) -> ParseTree:
+    def parse_without_parentheses(self, expr: str = None) -> ParseTree:
+        """
+        Function for team member zuhao's extra feature option 9
+        """
         if expr is None: return None
         tokens = tokenize(expr)
         operator_stack = Stack()

@@ -78,7 +78,7 @@ class Menu:
                     self._wait_for_continue()
                 case '8':
                     self.loadhistory()
-                    self._wait_for_continue
+                    self._wait_for_continue()
                 case '9':
                     self.evaluatenoparanthesis()
                     self._wait_for_continue()
@@ -169,7 +169,6 @@ class Menu:
             print('Invalid expression in file. Aborting load.')
             return
 
-        # Now add_expression will trigger the history logic for EVERY line
         for name, expr in parsed_expressions:
             self.EM.add_expression(name, expr)
 
@@ -422,7 +421,7 @@ class Menu:
                 message,result,name,expr = self.EM.validation(expression)
             elif result == True:
                 try:
-                    tree = self.EM.parser.parses(expr)
+                    tree = self.EM.parser.parse_without_parentheses(expr)
                     if type(tree) == int:
                         print(f'"{expression} ==> {expr}')
                     print()

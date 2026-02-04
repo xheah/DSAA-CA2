@@ -35,7 +35,6 @@ class ExpressionManager:
         # 3. Create the expression object and store it in active expressions
         self.expressions[var_name] = DaskExpression(var_name, expression_str)
 
-        self.expressions[var_name] = DaskExpression(var_name, expression_str)
 
     def validate_expression(self, expression:str) -> tuple:
         """
@@ -125,8 +124,11 @@ class ExpressionManager:
     def gethistory(self):
         return self.history
     
-    def validation(self,expression: str):
-
+    def validation(self,expression: str) -> tuple: 
+        """
+        Validation feature specifically for team member Zuhao's option 9
+        Validates a given expression without parentheses
+        """
         valid_operators = {'+', '-', '*', '/', '**', '++', '//'}
         allowed_chars = set('0123456789+-*/=.')
 
