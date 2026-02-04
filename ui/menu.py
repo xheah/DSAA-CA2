@@ -7,7 +7,7 @@ from features.cost_analysis import CostAnalyser
 import re
 from features.differentiation import differentiate, UnsupportedOperatorError
 from dask_core.evaluator import Evaluator
-from dask_core.history import History
+from features.history import History
 
 
 class Menu:

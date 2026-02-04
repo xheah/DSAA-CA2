@@ -86,10 +86,3 @@ class History:
                         lines.append(content)
                 f.writelines(lines)
             return
-
-        
-
-
-                
-            
-        
