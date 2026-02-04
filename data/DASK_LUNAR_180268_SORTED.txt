@@ -6,10 +6,10 @@ Lambda=(2*(65.5+2.25))
 Mu=((Alpha+(Delta+(Pi*(Beta*(Gamma/Sigma)))))/2)
 
 *** Expressions with value=> 16
-Sigma=(Pi*1)
 Beta=(Pi+0)
-Pi=(Alpha+1)
 Omicron=(2**4)
+Pi=(Alpha+1)
+Sigma=(Pi*1)
 
 *** Expressions with value=> 15
 Alpha=(3*5)
@@ -21,6 +21,6 @@ Gamma=(1+0)
 Zeta=(3//(4++5))
 
 *** Expressions with value=> None
-Xi=(Iota/2)
 Iota=(Pi+Theta)
+Xi=(Iota/2)
 

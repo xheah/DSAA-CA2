@@ -64,6 +64,7 @@ class Menu:
                     self._wait_for_continue()
                 case '4':
                     self.read_from_file()
+                    self.display_current()
                     self._wait_for_continue()
                 case '5':
                     self.sortexpressions()
@@ -86,7 +87,7 @@ class Menu:
         print('\nBye, thanks for using ST1507 DSAA DASK Expression Evaluator')
     
     def _wait_for_continue(self):
-        input("Press enter key, to continue....")
+        input("\nPress enter key, to continue....")
         self.EM.evaluate_all()
 
     def add_modify(self):
@@ -108,10 +109,11 @@ class Menu:
                 break
 
     def display_current(self):
-        print("CURRENT EXPRESSIONS:\n********************")
+        print("\nCURRENT EXPRESSIONS:\n********************")
         for name in sorted(self.EM.expressions.keys()):
             expression = self.EM.expressions[name]
             print(expression)
+        print('')
 
         sleep(0.5)
 
@@ -196,7 +198,7 @@ class Menu:
             output += '\n'
         file_handler = FileHandler()
         file_handler.write_file(output)
-        print(f'\n>>> Sorting of DASK expressions completed!\n')
+        print(f'\n>>> Sorting of DASK expressions completed!')
 
     def request_expression(self) -> str:
         """
