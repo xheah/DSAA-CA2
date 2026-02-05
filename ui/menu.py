@@ -19,10 +19,10 @@ class Menu:
         self.option_display += "\t3. Evaluate a single DASK variable\n"
         self.option_display += "\t4. Read DASK expression from file\n"
         self.option_display += "\t5. Sort DASK expressions\n"
-        self.option_display += "\t6. Optimise Expressions and Cost Anaylsis (Aden)\n"
+        self.option_display += "\t6. Optimise Expressions and Cost Analysis (Aden)\n"
         self.option_display += "\t7. Symbolic Differentiation (Aden)\n"
         self.option_display += "\t8. Expression History (Zuhao)\n"
-        self.option_display += "\t9. Evaluation without parantheses (Zuhao)\n"
+        self.option_display += "\t9. Evaluation without parentheses (Zuhao)\n"
         self.option_display += "\t10. Exit\n"
         self.option_display += "Enter choice: "
 
