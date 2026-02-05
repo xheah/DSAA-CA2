@@ -64,7 +64,6 @@ class Menu:
                     self._wait_for_continue()
                 case '4':
                     self.read_from_file()
-                    self.display_current()
                     self._wait_for_continue()
                 case '5':
                     self.sortexpressions()
