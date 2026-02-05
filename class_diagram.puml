@@ -1,0 +1,147 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package "dask_core" {
+  class Evaluator {
+    - _operators
+    # __init__()
+    # _normalize_number(value)
+    # _sum_to(n)
+    # _apply_operator(op, left_val, right_val)
+    + eval_node(node, context, visited)
+    + process(node, context)
+  }
+  class DaskExpression {
+    + name
+    + expression
+    # __init__(var_name, expr)
+    + build_tree(parser)
+    + evaluate(evaluator, context)
+    # __str__()
+  }
+  class ExpressionManager {
+    + parser
+    + history
+    # __init__()
+    + add_expression(var_name, expression_str)
+    + validate_expression(expression)
+    + get_expression()
+    + evaluate_all()
+    + optimise_all()
+  }
+  class Operator {
+    + symbol
+    + apply(evaluator, left, right)
+  }
+  class ExpressionParser {
+    + precedence
+    + operators
+    # __init__()
+    + parse(expr)
+    + parse_without_parentheses(expr)
+  }
+  class ParseTree {
+    + original_root
+    + optimised_root
+    # __init__(root)
+    + evaluate(evaluator, context)
+    + print_rotated(node, level)
+    + printInOrder(node, level)
+    + optimise(node)
+    + display_optimised_root(node, level)
+  }
+  class TreeNode {
+    # __init__(value, left, right)
+    + value()
+    + value(new_value)
+    + left()
+    + left(new_left)
+    + right()
+  }
+  class TreeProcessor {
+    + process(node, context)
+  }
+}
+
+package "dask_core.data_structures" {
+  class Stack {
+    - _items
+    # __init__()
+    + push(item)
+    + pop()
+    + peek()
+    + is_empty()
+    + size()
+  }
+}
+
+package "features" {
+  class CostAnalyser {
+    + tree
+    + statistics
+    # __init__(tree)
+    # _collect_metrics(root)
+    + count_nodes(root, count_type)
+    + count_tree_height(root)
+    + count_weighted_op_cost(root)
+  }
+  class UnsupportedOperatorError {
+  }
+  class Differentiator {
+    + wrt
+    # __init__(wrt)
+    + process(node, context)
+  }
+  class History {
+    + history
+    + project_root
+    # __init__(history)
+    + printhistory(history)
+    + promptrevert()
+    + savesession()
+  }
+  class Optimiser {
+    + parse_tree
+    # __init__(parse_tree)
+    + process(node, context)
+  }
+}
+
+package "io_utils" {
+  class FileHandler {
+    + project_root
+    - _file_index
+    # __init__()
+    # _build_file_index()
+    # _find_matches(filename)
+    + read_file()
+    + write_file(content)
+  }
+}
+
+package "ui" {
+  class Menu {
+    + option_display
+    + EM
+    + animation_delay
+    + history
+    + title_screen
+    # __init__()
+    + run_menu()
+    # _wait_for_continue()
+    + add_modify()
+    + display_current()
+    + display_n_evaluate_single()
+  }
+}
+
+TreeProcessor <|-- Evaluator
+TreeProcessor <|-- Differentiator
+TreeProcessor <|-- Optimiser
+
+' Associations
+ExpressionManager *-- DaskExpression
+DaskExpression o-- ParseTree
+ParseTree o-- TreeNode
+Menu o-- ExpressionManager
+@enduml
