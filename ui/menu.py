@@ -172,7 +172,6 @@ class Menu:
 
         self.EM.evaluate_all()
         self.display_current()
-        print('\n\n')
 
 
     def sortexpressions(self):
@@ -403,7 +402,7 @@ class Menu:
     def loadhistory(self):
         history = History(self.EM.history)
         name, expr = history.printhistory(history.history)
-        if name == '' and expr == '':
+        if name == None and expr == None:
             return
         else:
             self.EM.add_expression(name,expr)

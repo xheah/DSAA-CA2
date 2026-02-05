@@ -69,7 +69,7 @@ class History:
         
         if sessioninput.upper() == 'N':
             print('returning to main menu.')
-            return
+            return False
         while True:
             filename = input('\nPlease enter ouptut file: ').strip()
             if not filename:
