@@ -5,20 +5,24 @@ class History:
         self.history = history
         self.project_root = Path(__file__).resolve().parents[1]
 
-    def printhistory(self,history):
+    def printhistory(self, history):
         if not history:
-            print('\nTHERE ARE NO EXISTING EXPRESSIONS\n')
+            print('\nTHERE ARE NO EXISTING EXPRESSIONS')
+            # Even if empty, we call savesession to meet your requirement
+            self.savesession() 
+            # Return empty strings so loadhistory doesn't crash during unpacking
+            return '', '' 
 
         else:
             sortedHistory = dict(sorted(history.items()))
-            print('')
-            print('EXPRESSION HISTORY')
+            print('\nEXPRESSION HISTORY')
             print('**************************')
             for i in sortedHistory:
                 print(f'VARIABLE ==> {i}')
-                for expr,version in sortedHistory[i].items():
+                for expr, version in sortedHistory[i].items():
                     print(f'EXPRESSION: {expr} VERSION: {version}')
                 print('')
+            
             self.history = sortedHistory
             return self.promptrevert()
 
@@ -29,7 +33,7 @@ class History:
 
         if userInput.upper() == 'N':
             self.savesession()
-            return '', ''
+            return None, None
         
         variableName = input('\nPlease enter the name of the variable: ')
         while variableName not in self.history:
