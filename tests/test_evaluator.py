@@ -231,3 +231,56 @@ class TestEvaluator:
         result = evaluator.eval_node(node, context)
         assert result is None
 
+    def test_apply_operator_double_plus_rejects_float(self, evaluator):
+        """Test _apply_operator() with ++ rejects non-integer operands."""
+        result = evaluator._apply_operator('++', 3.5, 4)
+        assert result is None
+        result = evaluator._apply_operator('++', 3, 4.5)
+        assert result is None
+
+    def test_apply_operator_double_slash_rejects_float(self, evaluator):
+        """Test _apply_operator() with // rejects non-integer operands."""
+        result = evaluator._apply_operator('//', 3.5, 2)
+        assert result is None
+        result = evaluator._apply_operator('//', 3, 2.5)
+        assert result is None
+
+    def test_apply_operator_double_plus_rejects_negative(self, evaluator):
+        """Test _apply_operator() with ++ rejects negative operands."""
+        result = evaluator._apply_operator('++', -3, 4)
+        assert result is None
+        result = evaluator._apply_operator('++', 3, -4)
+        assert result is None
+
+    def test_apply_operator_double_slash_rejects_negative(self, evaluator):
+        """Test _apply_operator() with // rejects negative operands."""
+        result = evaluator._apply_operator('//', -3, 2)
+        assert result is None
+        result = evaluator._apply_operator('//', 3, -2)
+        assert result is None
+
+    def test_apply_operator_double_plus_rejects_zero(self, evaluator):
+        """Test _apply_operator() with ++ rejects zero operands."""
+        result = evaluator._apply_operator('++', 0, 4)
+        assert result is None
+        result = evaluator._apply_operator('++', 3, 0)
+        assert result is None
+
+    def test_apply_operator_double_slash_rejects_zero(self, evaluator):
+        """Test _apply_operator() with // rejects zero operands."""
+        result = evaluator._apply_operator('//', 0, 2)
+        assert result is None
+        result = evaluator._apply_operator('//', 3, 0)
+        assert result is None
+
+    def test_apply_operator_double_plus_accepts_whole_float(self, evaluator):
+        """Test _apply_operator() with ++ accepts whole number floats."""
+        # 3.0 and 4.0 are whole numbers, should be accepted
+        result = evaluator._apply_operator('++', 3.0, 4.0)
+        assert result == 16  # sum_to(3) + sum_to(4) = 6 + 10 = 16
+
+    def test_apply_operator_double_slash_accepts_whole_float(self, evaluator):
+        """Test _apply_operator() with // accepts whole number floats."""
+        # 3.0 and 2.0 are whole numbers, should be accepted
+        result = evaluator._apply_operator('//', 3.0, 2.0)
+        assert result == 2  # sum_to(3) / sum_to(2) = 6 / 3 = 2

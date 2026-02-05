@@ -35,21 +35,34 @@ class DivOperator(Operator):
         return left / right
 
 
+def _is_positive_integer(value) -> bool:
+    """Check if value is a positive integer (or float with no decimal part)."""
+    if isinstance(value, int):
+        return value > 0
+    if isinstance(value, float):
+        return value > 0 and value.is_integer()
+    return False
+
+
 class SumOperator(Operator):
     symbol = "++"
 
     def apply(self, evaluator, left, right):
-        return evaluator._sum_to(left) + evaluator._sum_to(right)
+        if not _is_positive_integer(left) or not _is_positive_integer(right):
+            return None
+        return evaluator._sum_to(int(left)) + evaluator._sum_to(int(right))
 
 
 class DivSumOperator(Operator):
     symbol = "//"
 
     def apply(self, evaluator, left, right):
-        divisor = evaluator._sum_to(right)
+        if not _is_positive_integer(left) or not _is_positive_integer(right):
+            return None
+        divisor = evaluator._sum_to(int(right))
         if divisor == 0:
             return None
-        return evaluator._sum_to(left) / divisor
+        return evaluator._sum_to(int(left)) / divisor
 
 
 class PowOperator(Operator):
