@@ -400,14 +400,19 @@ class Menu:
     
     
     def loadhistory(self):
-        history = History(self.EM.history)
-        name, expr = history.printhistory(history.history)
-        if name == None and expr == None:
-            return
-        else:
-            self.EM.add_expression(name,expr)
-            self.EM.evaluate_all()
-            return
+        # This matches your Option 8
+        history_manager = History(self.EM.history)
+        
+        # name and expr will now ALWAYS be populated (either with strings or None)
+        name, expr = history_manager.printhistory(self.EM.history)
+        
+        if name is None:
+            # User either had no history, said 'N', or cancelled.
+            return 
+        
+        # If we get here, we have a valid variable and expression to revert to
+        self.EM.add_expression(name, expr)
+        self.EM.evaluate_all()
 
 
     def evaluatenoparanthesis(self):
