@@ -13,7 +13,6 @@ class History:
         """
         if not history:
             print('\nTHERE ARE NO EXISTING EXPRESSIONS')
-            self.savesession() 
             # We return None, None so loadhistory in main.py doesn't crash
             return None, None 
 
